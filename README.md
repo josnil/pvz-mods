@@ -134,8 +134,8 @@ python _build_pages.py     # 会自动与 mods.js 做双向一致性自检
 ## 验收自查
 
 ```bash
-python _check_site.py          # 20 项检查
-python _check_site.py --neg    # 额外跑 4 个负面用例（验证检查器本身有效）
+python _check_site.py          # 21 项检查
+python _check_site.py --neg    # 额外跑 5 个负面用例（验证检查器本身有效）
 node _verify_interaction.js    # 真实浏览器交互验收（21 项，需 playwright + 系统 Edge）
 node _verify_live.js           # 对线上 URL 再跑一次冒烟（13 项）
 ```
@@ -147,10 +147,12 @@ node _verify_live.js           # 对线上 URL 再跑一次冒烟（13 项）
 - **C JS 接线** —— 每页挂载 `app.js`、`data-depth` 与实际层级一致
 - **D 数据一致性** —— 8 个 mod 在首页/分类页/详情页三处都出现，统计数字对得上
 - **E 无障碍** —— `reduced-motion` 显式兜底、≥44px 触控目标、`:focus-visible`、
-  **`brand-700` 绝不用作文字色**（对黑底仅 2.5:1）、每页有 `h1`/`lang`/`main`
+  **`brand-700` 绝不用作文字色**（对黑底仅 2.5:1）、每页有 `h1`/`lang`/`main`、
+  **封面容器一律 `object-fit:contain`**（方图被 `cover` 会切主体）
 
-负面用例注入 4 种故障（删封面 / 改错 `data-depth` / 把 `brand-700` 当文字色 /
-破坏 `reduced-motion` 兜底），断言检查器全部能抓到 —— 保证绿灯不是因为检查器瞎了。
+负面用例注入 5 种故障（删封面 / 改错 `data-depth` / 把 `brand-700` 当文字色 /
+破坏 `reduced-motion` 兜底 / 把封面容器改回 `object-fit:cover`），断言检查器全部能抓到
+—— 保证绿灯不是因为检查器瞎了。
 
 ---
 
