@@ -3,7 +3,11 @@
 > 云漫行的《植物大战僵尸杂交版》（Godot 4 + C#）个人 Mod 作品集站点。
 > 深色极简、硬边、巨型排版，主页三类 Mod 以**扑克牌叠**形式呈现，悬停自动展开。
 
-**在线访问**：https://josnil.github.io/pvz-mods/
+**在线访问**：
+
+- **GitHub Pages** —— https://josnil.github.io/pvz-mods/
+  （源码仓库 https://github.com/josnil/pvz-mods ）
+- **内置发布镜像** —— https://pvz-mods-gallery.app.workbuddy.host/
 
 ---
 
@@ -63,7 +67,9 @@
 │       ├── covers/                # 8 张 512×512 封面
 │       └── frames/                # 逐帧动画序列图
 ├── _build_pages.py                # 由单份模板生成 11 个页面
-└── _check_site.py                 # 验收自查（含 --neg 负面用例）
+├── _check_site.py                 # 验收自查（含 --neg 负面用例）
+├── _verify_interaction.js         # 真实浏览器交互验收（Playwright）
+└── _verify_live.js                # 线上站点冒烟验收（对真 URL）
 ```
 
 ---
@@ -130,6 +136,8 @@ python _build_pages.py     # 会自动与 mods.js 做双向一致性自检
 ```bash
 python _check_site.py          # 20 项检查
 python _check_site.py --neg    # 额外跑 4 个负面用例（验证检查器本身有效）
+node _verify_interaction.js    # 真实浏览器交互验收（21 项，需 playwright + 系统 Edge）
+node _verify_live.js           # 对线上 URL 再跑一次冒烟（13 项）
 ```
 
 覆盖范围：
