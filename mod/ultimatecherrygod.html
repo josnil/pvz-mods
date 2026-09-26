@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>究极樱桃战神 — 植物大战僵尸杂交版 Mod</title>
+<meta name="description" content="高大近战植物：撕咬前方一格造成 300 伤害，并吐出樱桃子弹（直击 300 + 3×3 溅射 300）。被碾压反伤，咬车秒杀，每次咬击回血。">
+<meta name="color-scheme" content="dark">
+<link rel="icon" type="image/png" sizes="32x32" href="../assets/img/favicon-32.png">
+<link rel="apple-touch-icon" href="../assets/img/apple-touch-icon.png">
+<link rel="stylesheet" href="../assets/css/tokens.css">
+<link rel="stylesheet" href="../assets/css/base.css">
+<link rel="stylesheet" href="../assets/css/components.css">
+<link rel="stylesheet" href="../assets/css/stack.css">
+<link rel="stylesheet" href="../assets/css/pages.css">
+</head>
+
+<body data-depth="1" data-current="plants" data-crumbs='[{"label": "首页", "href": "index.html"}, {"label": "植物类", "href": "plants.html"}, {"label": "究极樱桃战神"}]'>
+<header data-shell-nav></header>
+
+<main id="main">
+
+  <section class="page-head" aria-labelledby="d-title">
+    <div class="page-head__inner">
+      <div class="page-head__crumbs" data-shell-crumbs></div>
+
+      <p class="label">MOD / ULTIMATECHERRYGOD</p>
+      <h1 id="d-title" class="h2">究极樱桃战神</h1>
+      <p class="lede">高大近战植物：撕咬前方一格造成 300 伤害，并吐出樱桃子弹（直击 300 + 3×3 溅射 300）。被碾压反伤，咬车秒杀，每次咬击回血。</p>
+    </div>
+  </section>
+
+  <section class="detail" aria-label="究极樱桃战神 详情">
+
+    <div class="detail__media" data-has-frames-holder data-has-frames="true" style="--frame-count:4">
+      <img src="../assets/img/covers/ultimatecherrygod.png" alt="究极樱桃战神 — 红色樱桃龙首状植物，金色巨口露出尖牙，周围环绕绿叶" width="512" height="512">
+      <span class="mod-card__frames" aria-hidden="true" style="--frame-count:4;background-image:url('../assets/img/frames/cherry-4f.png')"></span>
+    </div>
+
+    <div class="detail__info">
+
+      <div class="tags"><span class="tag">近战</span><span class="tag">溅射</span><span class="tag">防爆</span><span class="tag">高血量</span><span class="tag">钻卡</span></div>
+
+      <p class="body-text">高大近战植物：撕咬前方一格造成 300 伤害，并吐出樱桃子弹（直击 300 + 3×3 溅射 300）。被碾压反伤，咬车秒杀，每次咬击回血。</p>
+
+      <div class="detail__meta">
+        <span>作者 <b>云漫行</b></span>
+        <span>版本 <b>v1.0.0</b></span>
+        <span>卡片 <b>钻卡</b></span>
+        <span>体积 <b>610.3 KB</b></span>
+        <span>类别 <b>植物类</b></span>
+      </div>
+
+      <div class="detail__block">
+        <h2>属性数值</h2>
+        <table class="stats-table"><tbody>
+          <tr><th>阳光</th><td>666</td></tr><tr><th>血量</th><td>8000</td></tr><tr><th>冷却</th><td>30s</td></tr><tr><th>撕咬伤害</th><td>300</td></tr><tr><th>溅射伤害</th><td>300</td></tr><tr><th>单次受伤上限</th><td>500</td></tr>
+        </tbody></table>
+      </div>
+
+      <div class="detail__block">
+        <h2>实现要点</h2>
+        <ul class="detail__list"><li>撕咬：biteOnly 模式，不吞尸；咬击后吐出 UltimateCherryShot</li><li>樱桃子弹：西瓜溅射通道，3×3 范围（rangeSize 1.5×1.5）</li><li>防爆：explosionHurt = 0，爆炸免伤</li><li>防碾压：smashHurt = 500（碾压仅扣 500）；被碾压反伤 500</li><li>咬车秒杀：命中车辆直接摧毁，自损 500</li><li>每次咬击回血 100</li><li>体型：高大（height = 3）</li></ul>
+      </div>
+
+      <div class="detail__actions">
+        <a class="btn btn--primary btn--lg" href="https://github.com/josnil/pvz-mods/releases/latest/download/究极樱桃战神.pmod" download>下载 究极樱桃战神.pmod（610.3 KB）</a>
+        <a class="btn btn--lg" href="https://github.com/josnil/pvz-mods" target="_blank" rel="noopener">在 GitHub 查看</a>
+      </div>
+
+    </div>
+  </section>
+
+  <section class="related" aria-labelledby="rel-title">
+    <h2 id="rel-title" class="related__title">同类 Mod</h2>
+    <div class="catalog reveal-group">
+
+      <article class="tile reveal">
+        <a class="tile__media" href="supergatlingpea.html" aria-label="超级机枪射手 详情">
+          <img src="../assets/img/covers/supergatlingpea.png" alt="超级机枪射手 — 戴头盔与护目镜的绿色豌豆射手，装配多管机枪炮口" loading="lazy" width="512" height="512">
+          
+        </a>
+        <div class="tile__body">
+          <div class="tags"><span class="tag">齐射</span><span class="tag">大招</span><span class="tag">金卡</span><span class="tag">托管插件</span></div>
+          <h2 class="tile__title">
+            <a href="supergatlingpea.html">超级机枪射手</a>
+          </h2>
+          <p class="tile__desc">每 1.5 秒向前方一次齐射 7 颗豌豆（横向排开、互不重叠）；每次攻击有 10% 概率触发大招 —— 5 秒内倾泻约 300 颗豌豆。</p>
+          <dl class="stats-table" style="margin-top:var(--sp-2)">
+            <tr><th>卡片</th><td>金卡</td></tr>
+            <tr><th>版本</th><td>v1.0.0</td></tr>
+            <tr><th>体积</th><td>173.9 KB</td></tr>
+          </dl>
+          <div class="detail__actions" style="margin-top:var(--sp-3)">
+            <a class="btn btn--primary" href="supergatlingpea.html">查看详情</a>
+            <a class="btn" href="https://github.com/josnil/pvz-mods/releases/latest/download/超级机枪射手.pmod" download>下载 .pmod · 173.9 KB</a>
+          </div>
+        </div>
+      </article>
+    </div>
+  </section>
+
+</main>
+
+<footer data-shell-footer></footer>
+
+<script type="module" src="../assets/js/app.js"></script>
+</body>
+</html>

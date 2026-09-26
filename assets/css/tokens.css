@@ -1,0 +1,145 @@
+/* ═══════════════════════════════════════════════════════════════
+   tokens.css — 设计令牌（单一真源）
+   来源：.workbuddy/design/界面设计规范.md
+   风格：深色极简 · 硬边 · 巨型排版 · 克制动效
+   ═══════════════════════════════════════════════════════════════ */
+
+:root {
+  /* ── 基础色 ─────────────────────────────────────────── */
+  --color-bg:            #000000;
+  --color-bg-elevated:   #0a0a0a;
+  --color-fg:            #ffffff;
+  --color-fg-muted:      #a1a1a1;   /* 次级文本 · 对黑底 7.0:1 ✅ */
+  --color-fg-subtle:     #656565;   /* 三级文本 · 同上 3.9:1，仅限大字 */
+
+  /* ── 中性灰阶 ───────────────────────────────────────── */
+  --gray-50:  #fafafa;
+  --gray-100: #efefef;
+  --gray-300: #c7c7c7;
+  --gray-500: #656565;
+  --gray-700: #333333;
+  --gray-900: #111827;
+  --gray-950: #0a0a0a;
+
+  /* ── 强调色 ─────────────────────────────────────────── */
+  /* ⚠️ brand-700 亮度极低（对黑底仅 2.5:1），只可做装饰/大面积图形，
+        绝不可作为文字色 —— 深底上的蓝字一律用 brand-400 */
+  --brand-700:   #042db4;
+  --brand-600:   #0437e0;
+  --brand-400:   #4d6cff;   /* 深底蓝字 · 5.4:1 ✅ */
+  --brand-200:   #b3c2ff;
+  --accent-teal: #2081aa;
+
+  /* ── 玻璃拟态层 ─────────────────────────────────────── */
+  --glass-1: rgba(255, 255, 255, 0.03);
+  --glass-2: rgba(255, 255, 255, 0.08);
+  --glass-3: rgba(255, 255, 255, 0.15);
+  --glass-4: rgba(255, 255, 255, 0.20);
+  --glass-5: rgba(255, 255, 255, 0.60);
+
+  /* ── 语义色（深底适配）─────────────────────────────── */
+  --success: #3ddc84;
+  --warning: #ffb020;
+  --error:   #ff5c5c;
+  --info:    var(--brand-400);
+
+  /* ── 卡牌稀有度（驱动卡框着色）─────────────────────── */
+  --card-gold:    #e8b93d;
+  --card-diamond: #63d6ff;
+  --card-map:     #7ec87e;
+  --card-tool:    #b3a5ff;
+  --card-default: var(--glass-5);
+
+  /* ── 字体 ───────────────────────────────────────────── */
+  --font-display: "TWK Lausanne", "Inter", -apple-system, BlinkMacSystemFont,
+                  "PingFang SC", "Microsoft YaHei", "Hiragino Sans GB", sans-serif;
+  --font-body:    "Inter", -apple-system, BlinkMacSystemFont,
+                  "PingFang SC", "Microsoft YaHei", "Hiragino Sans GB", sans-serif;
+  --font-mono:    ui-monospace, "JetBrains Mono", Consolas, "Cascadia Mono", monospace;
+
+  --fw-light:  300;
+  --fw-normal: 400;
+  --fw-medium: 500;
+  --fw-bold:   700;
+
+  /* ── 字号（8px 基线模块化刻度）────────────────────── */
+  --text-xs:   0.75rem;    /* 12px 标签 */
+  --text-sm:   0.875rem;   /* 14px 辅助 */
+  --text-base: 1rem;       /* 16px 正文 */
+  --text-lg:   1.125rem;   /* 18px 导语 */
+  --text-xl:   1.5rem;     /* 24px H3 */
+  --text-2xl:  2rem;       /* 32px H2 */
+  --text-3xl:  3rem;       /* 48px */
+  --text-4xl:  4rem;       /* 64px */
+  --text-5xl:  6rem;       /* 96px */
+  --text-hero: clamp(2.75rem, 11vw, 9rem);   /* 44px → 144px 流体 */
+
+  /* 行高 —— 字越大行高越紧；中文整体比英文松 */
+  --lh-hero:    0.95;
+  --lh-heading: 1.15;
+  --lh-snug:    1.3;
+  --lh-body:    1.75;
+  --lh-caps:    1.1;
+
+  /* 字距 —— ⚠️ 中文负字距必须收敛，最紧 -0.01em */
+  --ls-hero:  -0.01em;
+  --ls-head:  -0.01em;
+  --ls-body:   0em;
+  --ls-label:  0.08em;   /* 仅英文/数字标签 */
+
+  /* ── 间距（8px 基线）───────────────────────────────── */
+  --sp-1:  0.25rem;
+  --sp-2:  0.5rem;
+  --sp-3:  0.75rem;
+  --sp-4:  1rem;
+  --sp-5:  1.5rem;
+  --sp-6:  2rem;
+  --sp-8:  3rem;
+  --sp-10: 4rem;
+  --sp-12: 6rem;
+  --sp-16: 8rem;
+
+  /* ── 布局 ───────────────────────────────────────────── */
+  --page-max:    1920px;
+  --content-max: 1280px;
+  --gutter:      clamp(1.25rem, 5vw, 2.5rem);
+
+  /* ── 圆角：风格核心 = 硬边，近乎无圆角 ──────────────── */
+  --radius-none: 0px;
+  --radius-sm:   2px;
+  --radius-pill: 9999px;
+
+  /* ── 层级 ───────────────────────────────────────────── */
+  --z-base:    0;
+  --z-content: 4;
+  --z-sticky:  9;
+  --z-cursor:  10;
+  --z-overlay: 100;
+
+  /* ── 动效 ───────────────────────────────────────────── */
+  --dur-instant: 120ms;
+  --dur-fast:    200ms;
+  --dur-base:    300ms;
+  --dur-slow:    500ms;
+  --dur-reveal:  700ms;
+  --dur-marquee: 30s;
+
+  --ease-out:    cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-linear: linear;
+
+  --stagger-step: 60ms;
+
+  /* ── 牌叠几何（供 stack.css 覆写）──────────────────── */
+  /* 收起态：紧凑扇形。参数取值的取舍 ——
+     rot-step 太小 ⇒ 完全看不出是"一叠牌"（就是一张卡）；
+     太大 ⇒ 卡面被斜切太多、封面认不出。1.8° × 2 张向外 ≈ 4° 总倾角，
+     配合 9px 水平错位，露出的边缘刚好够读出"有多张"而不糊住封面。 */
+  --rot-step: 1.8deg;    /* 收起：每张卡的旋转增量 */
+  --tx-step:  9px;       /* 收起：每张卡的水平位移 */
+  --ty-step:  0px;
+  --card-w:   132px;     /* 卡宽，随断点调整 */
+}
+
+/* 展开态：由 stack.css 在 :hover / :focus-within / [data-open] 时覆写上述 3 个变量 */

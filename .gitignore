@@ -1,0 +1,23 @@
+# 开发/验证用产物 —— 不发布到 GitHub Pages
+#
+# 站点本体是纯静态 HTML/CSS/JS，无构建步骤。
+# _build_pages.py / _check_site.py 体积很小且是维护利器（README 有文档），
+# **保留在仓库里**；只有体量大的验收截图排除掉。
+
+# Playwright 验收截图（2.4 MB，仅本地留档）
+_shots/
+
+# 一次性推送工具（路径写死本机，不属于站点）
+_api_push.py
+_shot_final.js
+
+# Python 缓存
+__pycache__/
+*.pyc
+
+# 编辑器/系统
+.vscode/
+.idea/
+Thumbs.db
+desktop.ini
+.DS_Store

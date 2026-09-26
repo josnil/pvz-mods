@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>向日葵女王僵尸 — 植物大战僵尸杂交版 Mod</title>
+<meta name="description" content="一包两个僵尸共用一个 DLL：女王 = 火焰迪斯科身体 + 向日葵女王头，会滑步、点燃队友子弹、召唤伴舞；舞者 = 火焰舞者身体 + 同款头。">
+<meta name="color-scheme" content="dark">
+<link rel="icon" type="image/png" sizes="32x32" href="../assets/img/favicon-32.png">
+<link rel="apple-touch-icon" href="../assets/img/apple-touch-icon.png">
+<link rel="stylesheet" href="../assets/css/tokens.css">
+<link rel="stylesheet" href="../assets/css/base.css">
+<link rel="stylesheet" href="../assets/css/components.css">
+<link rel="stylesheet" href="../assets/css/stack.css">
+<link rel="stylesheet" href="../assets/css/pages.css">
+</head>
+
+<body data-depth="1" data-current="zombies" data-crumbs='[{"label": "首页", "href": "index.html"}, {"label": "僵尸类", "href": "zombies.html"}, {"label": "向日葵女王僵尸"}]'>
+<header data-shell-nav></header>
+
+<main id="main">
+
+  <section class="page-head" aria-labelledby="d-title">
+    <div class="page-head__inner">
+      <div class="page-head__crumbs" data-shell-crumbs></div>
+
+      <p class="label">MOD / SUNFLOWERQUEENZOMBIE</p>
+      <h1 id="d-title" class="h2">向日葵女王僵尸</h1>
+      <p class="lede">一包两个僵尸共用一个 DLL：女王 = 火焰迪斯科身体 + 向日葵女王头，会滑步、点燃队友子弹、召唤伴舞；舞者 = 火焰舞者身体 + 同款头。</p>
+    </div>
+  </section>
+
+  <section class="detail" aria-label="向日葵女王僵尸 详情">
+
+    <div class="detail__media" data-has-frames-holder>
+      <img src="../assets/img/covers/sunflowerqueenzombie.png" alt="向日葵女王僵尸 — 戴金色王冠的向日葵头，配火焰迪斯科身体，脚踩火焰光环" width="512" height="512">
+      
+    </div>
+
+    <div class="detail__info">
+
+      <div class="tags"><span class="tag">双角色</span><span class="tag">追踪</span><span class="tag">灼烧光环</span><span class="tag">召唤</span><span class="tag">钻卡</span></div>
+
+      <p class="body-text">一包两个僵尸共用一个 DLL：女王 = 火焰迪斯科身体 + 向日葵女王头，会滑步、点燃队友子弹、召唤伴舞；舞者 = 火焰舞者身体 + 同款头。</p>
+
+      <div class="detail__meta">
+        <span>作者 <b>云漫行</b></span>
+        <span>版本 <b>v1.0.0</b></span>
+        <span>卡片 <b>一包两角色</b></span>
+        <span>体积 <b>25.7 KB</b></span>
+        <span>类别 <b>僵尸类</b></span>
+      </div>
+
+      <div class="detail__block">
+        <h2>属性数值</h2>
+        <table class="stats-table"><tbody>
+          <tr><th>女王血量</th><td>3850</td></tr><tr><th>女王啃食</th><td>300</td></tr><tr><th>女王阳光</th><td>350</td></tr><tr><th>女王冷却</th><td>15s</td></tr><tr><th>火球齐射</th><td>6 颗 / 1.5s</td></tr><tr><th>脑光产出</th><td>250 / 10s</td></tr><tr><th>舞者血量</th><td>880</td></tr><tr><th>舞者阳光</th><td>75</td></tr>
+        </tbody></table>
+      </div>
+
+      <div class="detail__block">
+        <h2>实现要点</h2>
+        <ul class="detail__list"><li>3×3 光环：每 0.5s 对敌方造成 25 点灼烧</li><li>光环对全阵营（含自身）施加 FireHit —— 免减速、免冻结</li><li>6 颗追踪火球同帧发射（fireMethodFlags = 32，speed 为负）</li><li>召唤伴舞僵尸</li><li>unUseBuffFlags = 19</li></ul>
+      </div>
+
+      <div class="detail__actions">
+        <a class="btn btn--primary btn--lg" href="https://github.com/josnil/pvz-mods/releases/latest/download/向日葵女王僵尸.pmod" download>下载 向日葵女王僵尸.pmod（25.7 KB）</a>
+        <a class="btn btn--lg" href="https://github.com/josnil/pvz-mods" target="_blank" rel="noopener">在 GitHub 查看</a>
+      </div>
+
+    </div>
+  </section>
+
+  <section class="related" aria-labelledby="rel-title">
+    <h2 id="rel-title" class="related__title">同类 Mod</h2>
+    <div class="catalog reveal-group">
+
+      <article class="tile reveal">
+        <a class="tile__media" href="supergatlingpaper.html" aria-label="超级机枪读报僵尸 详情">
+          <img src="../assets/img/covers/supergatlingpaper.png" alt="超级机枪读报僵尸 — 戴头盔护目镜的读报僵尸，手持报纸并装配机枪炮口" loading="lazy" width="512" height="512">
+          
+        </a>
+        <div class="tile__body">
+          <div class="tags"><span class="tag">远程</span><span class="tag">护具</span><span class="tag">暴走</span><span class="tag">钻卡</span><span class="tag">托管插件</span></div>
+          <h2 class="tile__title">
+            <a href="supergatlingpaper.html">超级机枪读报僵尸</a>
+          </h2>
+          <p class="tile__desc">读报僵尸的身体 + 超级机枪射手的头。每 1.5 秒直线连发 7 颗豌豆，10% 概率触发 5 秒 300 颗大招；报纸被打破后 3 倍速暴走。</p>
+          <dl class="stats-table" style="margin-top:var(--sp-2)">
+            <tr><th>卡片</th><td>钻卡</td></tr>
+            <tr><th>版本</th><td>v1.0.0</td></tr>
+            <tr><th>体积</th><td>177.1 KB</td></tr>
+          </dl>
+          <div class="detail__actions" style="margin-top:var(--sp-3)">
+            <a class="btn btn--primary" href="supergatlingpaper.html">查看详情</a>
+            <a class="btn" href="https://github.com/josnil/pvz-mods/releases/latest/download/超级机枪读报僵尸.pmod" download>下载 .pmod · 177.1 KB</a>
+          </div>
+        </div>
+      </article>
+      <article class="tile reveal">
+        <a class="tile__media" href="discogargantuarpult.html" aria-label="暴走舞王伽刚特尔投石车僵尸 详情">
+          <img src="../assets/img/covers/discogargantuarpult.png" alt="暴走舞王伽刚特尔投石车僵尸 — 投石车僵尸造型，车斗内载着暴走舞王伽刚特尔" loading="lazy" width="512" height="512">
+          
+        </a>
+        <div class="tile__body">
+          <div class="tags"><span class="tag">投掷</span><span class="tag">碾压</span><span class="tag">金卡</span><span class="tag">托管插件</span></div>
+          <h2 class="tile__title">
+            <a href="discogargantuarpult.html">暴走舞王伽刚特尔投石车僵尸</a>
+          </h2>
+          <p class="tile__desc">外形与机制完全照搬「小鬼投石车僵尸」，唯一区别是投石车里扔出来的不是小鬼，而是「暴走舞王伽刚特尔」。</p>
+          <dl class="stats-table" style="margin-top:var(--sp-2)">
+            <tr><th>卡片</th><td>金卡</td></tr>
+            <tr><th>版本</th><td>v1.0.0</td></tr>
+            <tr><th>体积</th><td>15.8 KB</td></tr>
+          </dl>
+          <div class="detail__actions" style="margin-top:var(--sp-3)">
+            <a class="btn btn--primary" href="discogargantuarpult.html">查看详情</a>
+            <a class="btn" href="https://github.com/josnil/pvz-mods/releases/latest/download/暴走舞王伽刚特尔投石车僵尸.pmod" download>下载 .pmod · 15.8 KB</a>
+          </div>
+        </div>
+      </article>
+    </div>
+  </section>
+
+</main>
+
+<footer data-shell-footer></footer>
+
+<script type="module" src="../assets/js/app.js"></script>
+</body>
+</html>

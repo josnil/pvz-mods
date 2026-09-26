@@ -1,0 +1,300 @@
+/* ═══════════════════════════════════════════════════════════════
+   stack.css — 扑克牌叠交互（本项目核心）
+
+   ▸ 收起态：紧凑扇形，旋转 ±4.5°、位移 ±22.5px（总宽 ~45px）
+   ▸ 展开态：宽距扇形，旋转 ±3°、位移 ±295px（总宽 ~590px），轻微抬升
+   ▸ 已实测：6 张卡展开需 ~590px，而三叠并排时每叠仅 ~373px（1200px 屏）
+     ⇒ 因此展开必须是「整行铺开」，脱离列宽约束
+   ▸ 移动端 <576px 无法悬停 ⇒ 改横向 scroll-snap 卡条
+   ═══════════════════════════════════════════════════════════════ */
+
+.stacks {
+  padding-block: var(--sp-8);
+}
+
+/* 三叠所在的行
+   ⚠️ 绝不能 overflow:hidden，否则铺开会被裁切 */
+.stacks__row {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-10);
+  overflow: visible;
+}
+
+/* ═══════ 单叠 ═══════ */
+
+.stack {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+  transition: opacity var(--dur-base) var(--ease-out);
+}
+
+/* 分类标题（真 button，带 aria-expanded）*/
+.stack__label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-3);
+  align-self: flex-start;
+  min-height: 44px;
+  padding: 0;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  text-align: start;
+  color: var(--color-fg);
+  transition: color var(--dur-fast) var(--ease-out);
+}
+.stack__label:hover { color: var(--brand-200); }
+
+.stack__name {
+  font-family: var(--font-display);
+  font-size: clamp(1.25rem, 3.5vw, 1.75rem);
+  font-weight: var(--fw-light);
+  line-height: 1.2;
+}
+
+.stack__count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.75rem;
+  height: 1.75rem;
+  padding: 0 var(--sp-2);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--color-fg-subtle);
+  border: 1px solid var(--glass-3);
+  border-radius: var(--radius-pill);
+}
+
+.stack__hint {
+  font-size: var(--text-xs);
+  color: var(--color-fg-subtle);
+}
+
+/* ═══════ 卡槽 ═══════ */
+
+.stack__cards {
+  position: relative;
+  display: block;                       /* 卡片全部绝对定位叠在同一锚点上 */
+  min-height: calc(var(--card-w) * 4 / 3 + 8px);
+  /* 默认在文档流内；桌面展开时改为绝对定位铺开 */
+}
+
+/* 单张卡：由 --c（居中偏移量）驱动扇形变换
+   ⚠️ 必须绝对定位居中 —— 若留在 flex 流里，每张卡各占 --card-w 宽，
+      三张就撑出 ~400px，"一叠牌"直接变成"一排卡"（实测踩过）。
+      绝对定位后所有卡共享同一中心锚点，靠 translate 错开，才真正叠起来。
+   ⚠️ 垂直用 inset-block:0 + margin-block:auto 居中，而不是 inset-block-start:0：
+      旋转原点是 bottom center，顶部对齐会让不同倾角的卡底边落在不同高度，
+      三叠并排时下缘参差（实测 plant 高 206px vs zombie 227px）。 */
+.stack__card {
+  --c: 0;
+  position: absolute;
+  inset-block: 0;
+  margin-block: auto;
+  inset-inline-start: 50%;
+  width: var(--card-w);
+  height: calc(var(--card-w) * 4 / 3);
+  margin-inline-start: calc(var(--card-w) / -2);   /* 居中锚点 */
+  transform:
+    translate3d(calc(var(--c) * var(--tx-step)), calc(var(--c) * var(--ty-step)), 0)
+    rotate(calc(var(--c) * var(--rot-step)));
+  transform-origin: bottom center;   /* 像捏住一叠牌的底边抖开 */
+  transition: transform var(--dur-base) var(--ease-out);
+}
+
+/* 叠放次序：中间的卡盖住两侧，视觉上像一叠牌 */
+.stack__card { z-index: calc(10 - abs(var(--c))); }
+
+/* ═══════ 展开态（三个触发通道，缺一不可）═══════ */
+
+/* 展开后的目标值
+   ⚠️ 绝不能不写条件的 `.stack__cards` —— 那会让展开量无差别下发给所有子卡，
+      收起态就变成"已经铺开"（实测收起宽度会错成 652px 而不是 ~45px）。
+      变量必须只挂在"该叠已激活"的选择器上。 */
+.stack:hover .stack__card,
+.stack:focus-within .stack__card,
+.stack[data-open="true"] .stack__card {
+  --rot-step: 1.2deg;
+  --tx-step:  118px;
+  --ty-step:  -4px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  /* ① 鼠标悬停 */
+  .stack:hover { z-index: 3; }
+
+  /* ② 键盘焦点进入 */
+  .stack:focus-within { z-index: 3; }
+
+  /* ③ 未激活的另两叠让位：淡出 + 下沉 */
+  .stacks__row:has(.stack:hover) .stack:not(:hover),
+  .stacks__row:has(.stack:focus-within) .stack:not(:focus-within) {
+    opacity: 0.25;
+  }
+
+  /* 桌面：整行铺开 —— 脱离列宽，以列中心为锚向两侧对称溢出
+     ⚠️ 卡片本身已是 absolute，这里只需把"卡槽"这个定位上下文铺满整行，
+        卡片就会以列中心为锚自然向两侧溢出，不需要再搬动卡槽本身。 */
+  .stack:hover .stack__cards,
+  .stack:focus-within .stack__cards {
+    inset-inline: 50%;
+    width: 0;                 /* 零宽锚点：卡片的 margin -w/2 正好对称外扩 */
+    margin-inline: 0;
+    will-change: transform;
+  }
+}
+
+/* 触屏 / 无 hover 设备：JS 点击切换 data-open */
+.stack[data-open="true"] { z-index: 3; }
+
+/* ═══════ 移动端：横向 scroll-snap 卡条 ═══════ */
+/* 悬停不存在，铺开放不下 ⇒ 改为可横滑的卡条，不做扇形旋转 */
+
+@media (max-width: 35.99em) {
+  .stacks__row {
+    flex-direction: column;
+    gap: var(--sp-12);
+  }
+
+  .stack__cards,
+  .stack:hover .stack__cards,
+  .stack:focus-within .stack__cards,
+  .stack[data-open="true"] .stack__cards {
+    position: static;
+    inset-inline: auto;
+    width: auto;
+    min-height: 0;
+    margin-inline: 0;
+    transform: none;
+    display: flex;                 /* 移动端回到真实流式布局（横滑条） */
+    justify-content: flex-start;
+    align-items: stretch;
+    gap: var(--sp-3);
+    /* 横滑 + 磁吸 */
+    overflow-x: auto;
+    overflow-y: visible;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: 0;
+    padding-bottom: var(--sp-3);
+    /* 隐藏滚动条但保留可滑性 */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    /* 右端渐隐提示「还有更多」 */
+    -webkit-mask-image: linear-gradient(90deg, #000 0, #000 92%, transparent 100%);
+    mask-image: linear-gradient(90deg, #000 0, #000 92%, transparent 100%);
+  }
+  .stack__cards::-webkit-scrollbar { display: none; }
+
+  .stack__card {
+    /* 解除绝对定位，回到 flex 流；不做扇形旋转（横滑时旋转会显得晃） */
+    position: relative;
+    inset-block-start: auto;
+    inset-inline-start: auto;
+    margin-inline-start: 0;
+    --c: 0 !important;
+    --rot-step: 0deg !important;
+    --tx-step: 0px !important;
+    --ty-step: 0px !important;
+    transform: none !important;
+    flex: 0 0 72%;
+    max-width: 220px;
+    scroll-snap-align: start;
+  }
+
+  /* 卡内文字放大到可读 */
+  .mod-card__name { font-size: var(--text-base); }
+
+  /* 浮窗在触屏不可用 ⇒ 改由卡底直接展示简介 */
+  .mod-card__pop { display: none; }
+  .mod-card__body { padding: var(--sp-4); }
+  .mod-card__inline-desc {
+    display: block;
+    margin-top: var(--sp-2);
+    font-size: var(--text-xs);
+    line-height: 1.6;
+    color: var(--color-fg-muted);
+  }
+}
+
+/* 576–809px：仍是纵向堆叠，但卡条可直接容纳全部卡 */
+@media (min-width: 36em) and (max-width: 50.624em) {
+  .mod-card__inline-desc { display: block; margin-top: var(--sp-2);
+    font-size: var(--text-xs); line-height: 1.6; color: var(--color-fg-muted); }
+}
+
+/* ═══════ 键盘可达性：铺开的卡必须能 Tab 进去 ═══════ */
+/* 收起态下虽被叠住，但仍在 DOM 中且可聚焦 —— 聚焦时该叠会自动展开，
+   所以不需要 visibility:hidden（那反而会让键盘用户无法到达） */
+.stack__card .mod-card { position: relative; z-index: 1; }
+.stack__card:focus-within { z-index: 20; }
+
+/* ═══════════════════════════════════════════════════════════════
+   减少动效偏好
+   ⚠️ 必须让内容完整可读，而不是简单地把动画关掉
+   ═══════════════════════════════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+  .stack__card { transition: none !important; }
+
+  /* 取消扇形，改为普通不透明网格，保证能读完所有卡 */
+  .stack__cards,
+  .stack:hover .stack__cards,
+  .stack:focus-within .stack__cards,
+  .stack[data-open="true"] .stack__cards {
+    position: static;
+    inset-inline: auto;
+    width: auto;
+    min-height: 0;
+    margin-inline: 0;
+    transform: none;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: var(--sp-4);
+  }
+  .stack__card {
+    /* 取消绝对定位，回到流式布局（否则卡片会全部叠在同一点） */
+    position: relative !important;
+    inset-block-start: auto !important;
+    inset-inline-start: auto !important;
+    margin-inline-start: 0 !important;
+    --c: 0 !important;
+    transform: none !important;
+  }
+  .stacks__row .stack { opacity: 1 !important; }
+}
+
+/* ═══════ 大屏：三列并排 ═══════ */
+
+@media (min-width: 50.625em) {
+  .stacks__row {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: var(--sp-8);
+  }
+  .stack {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+  .stack__cards { min-height: calc(var(--card-w) * 4 / 3 + 8px); }
+}
+
+@media (min-width: 75em) {
+  .stacks__row { gap: var(--sp-10); }
+}
+
+/* ═══════ 卡宽随断点 ═══════ */
+
+@media (min-width: 50.625em) { :root { --card-w: 132px; } }
+@media (min-width: 100em)    { :root { --card-w: 140px; } }
+@media (max-width: 35.99em)  { :root { --card-w: 100%; } }
+
+/* ═══════ 「更多 mod」卡：展开后永远排在最后 ═══════ */
+
+.stack__card--more { z-index: 5; }
+.stack__card--more .mod-card { height: 100%; }
