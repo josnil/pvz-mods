@@ -327,6 +327,37 @@ def check_a11y():
     else:
         ok('E 信息浮窗支持 hover + focus-within + data-pop 三通道')
 
+    # 10) ★ 封面不许被 cover 裁切
+    #     背景：所有封面都是 512×512 方图，且美术主体占满 ~88% 宽度。
+    #     若封面容器是竖版/横版（3:4、16:10）却用 object-fit:cover，
+    #     浏览器会**以容器比例放大再裁边**，主体被切 —— 实测肉眼可见
+    #     （牌叠卡曾把主体左右各切 12.5%）。故：凡承载封面的选择器一律 contain。
+    pagescss = read(os.path.join(ROOT, 'assets', 'css', 'pages.css'))
+    both = comp + '\n' + pagescss
+    cover_sel = ('.mod-card__media img', '.mod-card__video',
+                 '.detail__media img', '.tile__media img')
+    offending = []
+    for sel in cover_sel:
+        # 取出该选择器（可能多选择器逗号分隔，逐个找）的声明块
+        for probe in sel.split(','):
+            probe = probe.strip()
+            i = both.find(probe + ' {')
+            if i < 0:
+                i = both.find(probe + ' {'.replace(' ', '\n'))
+            if i < 0:
+                continue
+            j = both.find('}', i)
+            blk = both[i:j] if j > i else ''
+            # 去掉注释再判断，避免注释里的 "cover" 误伤
+            blk = re.sub(r'/\*.*?\*/', '', blk, flags=re.S)
+            if re.search(r'object-fit\s*:\s*cover', blk):
+                offending.append(sel)
+                break
+    if offending:
+        bad('E 封面容器用了 object-fit:cover（方图会被裁切）：' + ', '.join(offending))
+    else:
+        ok('E 封面容器一律 object-fit:contain（1:1 方图零裁切）')
+
 
 # ══════════════════════════════════════════════════════════════
 # F. 负面用例
@@ -377,6 +408,18 @@ def run_neg():
     with open(p4, 'w', encoding='utf-8', newline='') as f:
         f.write(t4.replace('opacity: 1 !important;', 'opacity: 0 !important;'))
     cases.append(('破坏 reduced-motion 的 opacity 兜底', dst4, 'rm'))
+
+    # 5) 把封面容器的 object-fit 改回 cover → E 应报错
+    #    （这是"方图被裁切"那类真实缺陷，静态检查必须能兜住）
+    tmp5 = tempfile.mkdtemp(prefix='pvz_neg_')
+    dst5 = os.path.join(tmp5, 'site')
+    _copy_tree(ROOT, dst5)
+    p5 = os.path.join(dst5, 'assets', 'css', 'components.css')
+    with open(p5, encoding='utf-8') as f:
+        t5 = f.read()
+    with open(p5, 'w', encoding='utf-8', newline='') as f:
+        f.write(t5 + '\n.mod-card__media img { object-fit: cover; }\n')
+    cases.append(('把封面容器改回 object-fit:cover', dst5, 'cover'))
 
     caught = 0
     for label, site, kind in cases:
@@ -443,6 +486,20 @@ def probe(site, kind):
         t = _read(os.path.join(site, 'assets', 'css', 'base.css'))
         if 'opacity: 1 !important' not in t:
             out.append('base.css 的 reduced-motion 兜底被破坏')
+
+    elif kind == 'cover':
+        # 与 check_a11y 的 #10 同逻辑：任何承载封面的选择器出现 object-fit:cover 即报错
+        sels = ('.mod-card__media img', '.mod-card__video',
+                '.detail__media img', '.tile__media img')
+        cssdir = os.path.join(site, 'assets', 'css')
+        blob = '\n'.join(_read(os.path.join(cssdir, c))
+                         for c in sorted(os.listdir(cssdir)))
+        blob = re.sub(r'/\*.*?\*/', '', blob, flags=re.S)
+        for sel in sels:
+            for m in re.finditer(re.escape(sel) + r'\s*\{([^}]*)\}', blob):
+                if re.search(r'object-fit\s*:\s*cover', m.group(1)):
+                    out.append('%s 用了 object-fit:cover（会裁切方图）' % sel)
+                    break
 
     return out
 

@@ -253,18 +253,24 @@ body:has(.nav__drawer[data-open="true"]) .nav__toggle {
 .mod-card[data-card-type="MAP"]     { --card-accent: var(--card-map); }
 .mod-card[data-card-type="TOOL"]    { --card-accent: var(--card-tool); }
 
-/* 封面区 */
+/* 封面区 —— ★ 必须是 1:1
+   ⚠️ 别让封面区跟着卡片的 3:4 走：所有封面都是 512×512 方图，塞进 3:4 的框里
+      `object-fit:cover` 会**以高为准放大约 1.33×**、把左右各 12.5% 切掉；
+      而这些美术主体本身就占满 ~88% 宽度 ⇒ 视觉上就是"主体被劈成两半"
+      （实测截图肉眼可见）。改成 1:1 后与封面天然同比例，`cover` 零裁切。 */
 .mod-card__media {
   position: relative;
-  flex: 1 1 auto;
-  min-height: 0;
+  flex: 0 0 auto;
+  aspect-ratio: 1 / 1;          /* ★ 与 512×512 封面同比例 ⇒ 不裁切 */
   margin: 3px 0 0;
   overflow: clip;
   background: var(--color-bg-elevated);
 }
 .mod-card__media img {
   width: 100%; height: 100%;
-  object-fit: cover;
+  /* ★ contain 而非 cover：封面区已是 1:1、封面也是 1:1 ⇒ contain 即"刚好铺满、
+     零裁切"；万一以后塞进非方图，contain 只会留边（可接受），而 cover 会切主体。 */
+  object-fit: contain;
   transition: transform var(--dur-slow) var(--ease-out);
 }
 .mod-card:hover .mod-card__media img { transform: scale(1.06); }
@@ -274,7 +280,7 @@ body:has(.nav__drawer[data-open="true"]) .nav__toggle {
   position: absolute;
   inset: 0;
   width: 100%; height: 100%;
-  object-fit: cover;
+  object-fit: contain;          /* ★ 同 img：封面区 1:1 ⇒ 留边不切 */
   opacity: 0;
   transition: opacity var(--dur-base) var(--ease-out);
 }
@@ -288,6 +294,9 @@ body:has(.nav__drawer[data-open="true"]) .nav__toggle {
   width: 100%; height: 100%;
   background-repeat: no-repeat;
   background-position: 0 0;
+  /* ★ 含住整帧（不放大裁切）：宽度=帧数×100%，高度按比例 auto 会上下留边，
+     故用 100% 高 + contain 等价写法：靠 background-size 的 100% 高 + 比例天然吻合
+     （cherry-4f 每帧本就是方的，与 1:1 封面区同比例） */
   background-size: calc(100% * var(--frame-count, 4)) 100%;
   opacity: 0;
   transition: opacity var(--dur-base) var(--ease-out);
@@ -470,7 +479,9 @@ body:has(.nav__drawer[data-open="true"]) .nav__toggle {
 }
 .tile__media img {
   width: 100%; height: 100%;
-  object-fit: cover;
+  /* ★ contain：目录卡是 16:10 横版，而封面是 1:1 方图；
+     cover 会把方图左右切掉，contain 才完整（上下留边，深底不显突兀） */
+  object-fit: contain;
   transition: transform var(--dur-slow) var(--ease-out);
 }
 .tile:hover .tile__media img { transform: scale(1.05); }

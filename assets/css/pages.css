@@ -230,7 +230,8 @@
 }
 .detail__media img {
   width: 100%; height: 100%;
-  object-fit: cover;
+  /* ★ contain：详情页封面区是 1:1、封面也是 1:1 ⇒ 零裁切；非方素材只留边不切主体 */
+  object-fit: contain;
 }
 .detail__media .mod-card__video,
 .detail__media .mod-card__frames {

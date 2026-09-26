@@ -11,6 +11,7 @@ _shots/
 _api_push.py
 _api_push.log
 _shot_final.js
+_shot_stacks.js
 
 # Python 缓存
 __pycache__/
