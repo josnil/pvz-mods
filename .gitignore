@@ -9,6 +9,7 @@ _shots/
 
 # 一次性推送工具（路径写死本机，不属于站点）
 _api_push.py
+_api_push.log
 _shot_final.js
 
 # Python 缓存
