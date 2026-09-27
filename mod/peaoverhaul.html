@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>超级机枪射手 — 植物大战僵尸杂交版 Mod</title>
-<meta name="description" content="每 1.5 秒向前方一次齐射 7 颗豌豆（横向排开、互不重叠）；每次攻击有 10% 概率触发大招 —— 5 秒内倾泻约 300 颗豌豆。">
+<title>豌豆强化 — 植物大战僵尸杂交版 Mod</title>
+<meta name="description" content="放大豌豆类子弹并提升伤害与穿透：一次覆盖 PeaDefault / SnowPea / FirePea / GoldPea 四种子弹，子弹 scale 提到 1.6 倍、穿透 8 个。演示型 Mod，适合作为「覆盖内置资源」的模板。">
 <meta name="color-scheme" content="dark">
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="icon" type="image/png" sizes="32x32" href="../assets/img/favicon-32.png">
@@ -16,7 +16,7 @@
 <link rel="stylesheet" href="../assets/css/pages.css">
 </head>
 
-<body data-depth="1" data-current="plants" data-crumbs='[{"label": "首页", "href": "index.html"}, {"label": "植物类", "href": "plants.html"}, {"label": "超级机枪射手"}]'>
+<body data-depth="1" data-current="plants" data-crumbs='[{"label": "首页", "href": "index.html"}, {"label": "植物类", "href": "plants.html"}, {"label": "豌豆强化"}]'>
 <header data-shell-nav></header>
 
 <main id="main">
@@ -25,49 +25,49 @@
     <div class="page-head__inner">
       <div class="page-head__crumbs" data-shell-crumbs></div>
 
-      <p class="label">MOD / SUPERGATLINGPEA</p>
-      <h1 id="d-title" class="h2">超级机枪射手</h1>
-      <p class="lede">每 1.5 秒向前方一次齐射 7 颗豌豆（横向排开、互不重叠）；每次攻击有 10% 概率触发大招 —— 5 秒内倾泻约 300 颗豌豆。</p>
+      <p class="label">MOD / PEAOVERHAUL</p>
+      <h1 id="d-title" class="h2">豌豆强化</h1>
+      <p class="lede">放大豌豆类子弹并提升伤害与穿透：一次覆盖 PeaDefault / SnowPea / FirePea / GoldPea 四种子弹，子弹 scale 提到 1.6 倍、穿透 8 个。演示型 Mod，适合作为「覆盖内置资…</p>
     </div>
   </section>
 
-  <section class="detail" aria-label="超级机枪射手 详情">
+  <section class="detail" aria-label="豌豆强化 详情">
 
     <div class="detail__media" data-has-frames-holder>
-      <img src="../assets/img/covers/supergatlingpea.png" alt="超级机枪射手 — 戴头盔与护目镜的绿色豌豆射手，装配多管机枪炮口" width="512" height="512">
+      <img src="../assets/img/covers/peaoverhaul.png" alt="豌豆强化 — 四颗被放大的豌豆子弹（普通绿豌豆 / 寒冰蓝豌豆 / 火焰豌豆 / 金色豌豆）" width="512" height="512">
       
     </div>
 
     <div class="detail__info">
 
-      <div class="tags"><span class="tag">齐射</span><span class="tag">大招</span><span class="tag">金卡</span><span class="tag">托管插件</span></div>
+      <div class="tags"><span class="tag">覆盖</span><span class="tag">子弹</span><span class="tag">穿透</span><span class="tag">模板</span></div>
 
-      <p class="body-text">每 1.5 秒向前方一次齐射 7 颗豌豆（横向排开、互不重叠）；每次攻击有 10% 概率触发大招 —— 5 秒内倾泻约 300 颗豌豆。</p>
+      <p class="body-text">放大豌豆类子弹并提升伤害与穿透：一次覆盖 PeaDefault / SnowPea / FirePea / GoldPea 四种子弹，子弹 scale 提到 1.6 倍、穿透 8 个。演示型 Mod，适合作为「覆盖内置资源」的模板。</p>
 
       <div class="detail__meta">
         <span>作者 <b>云漫行</b></span>
         <span>版本 <b>v1.0.0</b></span>
-        <span>卡片 <b>金卡</b></span>
-        <span>体积 <b>173.9 KB</b></span>
+        <span>卡片 <b>覆盖型</b></span>
+        <span>体积 <b>3.1 KB</b></span>
         <span>类别 <b>植物类</b></span>
       </div>
 
       <div class="detail__block">
         <h2>属性数值</h2>
         <table class="stats-table"><tbody>
-          <tr><th>阳光</th><td>600</td></tr><tr><th>血量</th><td>1000</td></tr><tr><th>冷却</th><td>30.0s</td></tr><tr><th>射速</th><td>1.5s</td></tr><tr><th>每轮弹数</th><td>7</td></tr><tr><th>弹速</th><td>500</td></tr>
+          <tr><th>覆盖子弹</th><td>4 种</td></tr><tr><th>弹药 scale</th><td>1.6×</td></tr><tr><th>穿透数</th><td>8</td></tr><tr><th>火焰弹伤害</th><td>120</td></tr><tr><th>是否含插件</th><td>否</td></tr><tr><th>体积</th><td>3.1 KB</td></tr>
         </tbody></table>
       </div>
 
       <div class="detail__block">
         <h2>实现要点</h2>
-        <ul class="detail__list"><li>地形要求：空地可直接种，也可种在双发射手上升级</li><li>大招触发：每次攻击 10% 概率，持续 5 秒</li><li>托管运行时：Runtime/ModAssembly.dll（入口 SuperGatlingPeaRuntimeEntry）</li></ul>
+        <ul class="detail__list"><li>overrides.Projectile = [PeaDefault, SnowPea, FirePea, GoldPea]</li><li>全部走「覆盖内置资源」，不新增任何角色或卡片</li><li>子弹尺寸 scale = (1.6, 1.6)，穿透 penetrateNum = 8</li><li>FirePea 伤害 120、damageFlags = 7、爆破粒子走 FireSplats</li><li>无托管运行时插件（runtimeAssembly 为空）</li></ul>
       </div>
 
       <div class="detail__block" data-download-block>
         <h2>下载</h2>
         <div class="detail__actions">
-          <a class="btn btn--primary btn--lg" href="https://pan.quark.cn/s/3e3b62402dfd" target="_blank" rel="noopener">夸克网盘下载</a><a class="btn btn--lg" href="https://github.com/josnil/pvz-mods/releases/latest/download/超级机枪射手.pmod" download>GitHub 下载 超级机枪射手.pmod（173.9 KB）</a>
+          <a class="btn btn--primary btn--lg" href="https://pan.quark.cn/s/05e3ee9fe1e3" target="_blank" rel="noopener">夸克网盘下载</a><a class="btn btn--lg" href="https://github.com/josnil/pvz-mods/releases/latest/download/PeaOverhaul.pmod" download>GitHub 下载 PeaOverhaul.pmod（3.1 KB）</a>
         </div>
         <p class="detail__dl-note">两个来源内容一致：<b>夸克网盘</b>免登录、国内直连，推荐；<b>GitHub</b> 为原始发布源，海外或需版本追溯时使用。</p>
       </div>
@@ -77,9 +77,9 @@
         <a class="btn btn--lg" href="https://pan.quark.cn/s/eca3724f6450" target="_blank" rel="noopener">夸克网盘 · 全部 Mod</a>
       </div>
 
-      <div class="detail__block" data-cloud-detail="supergatlingpea">
+      <div class="detail__block" data-cloud-detail="peaoverhaul">
         <div class="like-row">
-          <button class="like-btn" type="button" data-like-btn="supergatlingpea"
+          <button class="like-btn" type="button" data-like-btn="peaoverhaul"
                   data-count="0" data-liked="false" aria-pressed="false">
             <span class="like-btn__heart" aria-hidden="true">♡</span>
             <span class="like-btn__num">0</span>
@@ -93,7 +93,7 @@
   </section>
 
   <section class="comments-wrap" aria-labelledby="cm-title">
-    <div class="layout" style="max-width:820px" data-comments="supergatlingpea">
+    <div class="layout" style="max-width:820px" data-comments="peaoverhaul">
       <div class="comments__head">
         <h2 id="cm-title" class="h2">留言 <span class="comments__count" data-comment-count>0</span></h2>
         <p class="comments__lead">说说你的玩法体验，或报告遇到的问题。</p>
@@ -188,6 +188,28 @@
     <h2 id="rel-title" class="related__title">同类 Mod</h2>
     <div class="catalog reveal-group">
 
+      <article class="tile reveal" data-mod-card="supergatlingpea">
+        <a class="tile__media" href="supergatlingpea.html" aria-label="超级机枪射手 详情">
+          <img src="../assets/img/covers/supergatlingpea.png" alt="超级机枪射手 — 戴头盔与护目镜的绿色豌豆射手，装配多管机枪炮口" loading="lazy" width="512" height="512">
+          
+        </a>
+        <div class="tile__body">
+          <div class="tags"><span class="tag">齐射</span><span class="tag">大招</span><span class="tag">金卡</span><span class="tag">托管插件</span></div>
+          <h2 class="tile__title">
+            <a href="supergatlingpea.html">超级机枪射手</a>
+          </h2>
+          <p class="tile__desc">每 1.5 秒向前方一次齐射 7 颗豌豆（横向排开、互不重叠）；每次攻击有 10% 概率触发大招 —— 5 秒内倾泻约 300 颗豌豆。</p>
+          <dl class="stats-table" style="margin-top:var(--sp-2)">
+            <tr><th>卡片</th><td>金卡</td></tr>
+            <tr><th>版本</th><td>v1.0.0</td></tr>
+            <tr><th>体积</th><td>173.9 KB</td></tr>
+          </dl>
+          <div class="detail__actions" style="margin-top:var(--sp-3)">
+            <a class="btn" href="supergatlingpea.html">查看详情</a>
+            <a class="btn btn--primary" href="https://pan.quark.cn/s/3e3b62402dfd" target="_blank" rel="noopener">夸克网盘下载</a>
+          </div>
+        </div>
+      </article>
       <article class="tile reveal" data-mod-card="ultimatecherrygod">
         <a class="tile__media" data-has-frames="true" href="ultimatecherrygod.html" aria-label="究极樱桃战神 详情">
           <img src="../assets/img/covers/ultimatecherrygod.png" alt="究极樱桃战神 — 红色樱桃龙首状植物，金色巨口露出尖牙，周围环绕绿叶" loading="lazy" width="512" height="512">
@@ -207,28 +229,6 @@
           <div class="detail__actions" style="margin-top:var(--sp-3)">
             <a class="btn" href="ultimatecherrygod.html">查看详情</a>
             <a class="btn btn--primary" href="https://pan.quark.cn/s/f8cacc624df8" target="_blank" rel="noopener">夸克网盘下载</a>
-          </div>
-        </div>
-      </article>
-      <article class="tile reveal" data-mod-card="peaoverhaul">
-        <a class="tile__media" href="peaoverhaul.html" aria-label="豌豆强化 详情">
-          <img src="../assets/img/covers/peaoverhaul.png" alt="豌豆强化 — 四颗被放大的豌豆子弹（普通绿豌豆 / 寒冰蓝豌豆 / 火焰豌豆 / 金色豌豆）" loading="lazy" width="512" height="512">
-          
-        </a>
-        <div class="tile__body">
-          <div class="tags"><span class="tag">覆盖</span><span class="tag">子弹</span><span class="tag">穿透</span><span class="tag">模板</span></div>
-          <h2 class="tile__title">
-            <a href="peaoverhaul.html">豌豆强化</a>
-          </h2>
-          <p class="tile__desc">放大豌豆类子弹并提升伤害与穿透：一次覆盖 PeaDefault / SnowPea / FirePea / GoldPea 四种子弹，子弹 scale 提到 1.6 倍、穿透 8 个。演示型 Mod，适合作为「覆盖内置资源」的模板。</p>
-          <dl class="stats-table" style="margin-top:var(--sp-2)">
-            <tr><th>卡片</th><td>覆盖型</td></tr>
-            <tr><th>版本</th><td>v1.0.0</td></tr>
-            <tr><th>体积</th><td>3.1 KB</td></tr>
-          </dl>
-          <div class="detail__actions" style="margin-top:var(--sp-3)">
-            <a class="btn" href="peaoverhaul.html">查看详情</a>
-            <a class="btn btn--primary" href="https://pan.quark.cn/s/05e3ee9fe1e3" target="_blank" rel="noopener">夸克网盘下载</a>
           </div>
         </div>
       </article>

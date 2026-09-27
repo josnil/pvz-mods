@@ -6,6 +6,7 @@
 <title>暴走舞王伽刚特尔投石车僵尸 — 植物大战僵尸杂交版 Mod</title>
 <meta name="description" content="外形与机制完全照搬「小鬼投石车僵尸」，唯一区别是投石车里扔出来的不是小鬼，而是「暴走舞王伽刚特尔」。">
 <meta name="color-scheme" content="dark">
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="icon" type="image/png" sizes="32x32" href="../assets/img/favicon-32.png">
 <link rel="apple-touch-icon" href="../assets/img/apple-touch-icon.png">
 <link rel="stylesheet" href="../assets/css/tokens.css">
@@ -63,19 +64,131 @@
         <ul class="detail__list"><li>投掷物由插件替换：ZombieImp → ZombieDiscoGargantuar</li><li>（「ZombieImp」是硬编码字面量，纯数据改不掉）</li><li>美术复用内置小鬼投石车僵尸，零自制贴图</li><li>攻击类型为「碾压」，可压扁植物</li></ul>
       </div>
 
+      <div class="detail__block" data-download-block>
+        <h2>下载</h2>
+        <div class="detail__actions">
+          <a class="btn btn--primary btn--lg" href="https://pan.quark.cn/s/1bd55f3d58f6" target="_blank" rel="noopener">夸克网盘下载</a><a class="btn btn--lg" href="https://github.com/josnil/pvz-mods/releases/latest/download/暴走舞王伽刚特尔投石车僵尸.pmod" download>GitHub 下载 暴走舞王伽刚特尔投石车僵尸.pmod（15.8 KB）</a>
+        </div>
+        <p class="detail__dl-note">两个来源内容一致：<b>夸克网盘</b>免登录、国内直连，推荐；<b>GitHub</b> 为原始发布源，海外或需版本追溯时使用。</p>
+      </div>
+
       <div class="detail__actions">
-        <a class="btn btn--primary btn--lg" href="https://github.com/josnil/pvz-mods/releases/latest/download/暴走舞王伽刚特尔投石车僵尸.pmod" download>下载 暴走舞王伽刚特尔投石车僵尸.pmod（15.8 KB）</a>
         <a class="btn btn--lg" href="https://github.com/josnil/pvz-mods" target="_blank" rel="noopener">在 GitHub 查看</a>
+        <a class="btn btn--lg" href="https://pan.quark.cn/s/eca3724f6450" target="_blank" rel="noopener">夸克网盘 · 全部 Mod</a>
+      </div>
+
+      <div class="detail__block" data-cloud-detail="discogargantuarpult">
+        <div class="like-row">
+          <button class="like-btn" type="button" data-like-btn="discogargantuarpult"
+                  data-count="0" data-liked="false" aria-pressed="false">
+            <span class="like-btn__heart" aria-hidden="true">♡</span>
+            <span class="like-btn__num">0</span>
+            <span class="like-btn__text">点赞</span>
+          </button>
+          <span class="like-row__hint">喜欢这个 Mod？点个赞让作者知道。</span>
+        </div>
       </div>
 
     </div>
   </section>
 
+  <section class="comments-wrap" aria-labelledby="cm-title">
+    <div class="layout" style="max-width:820px" data-comments="discogargantuarpult">
+      <div class="comments__head">
+        <h2 id="cm-title" class="h2">留言 <span class="comments__count" data-comment-count>0</span></h2>
+        <p class="comments__lead">说说你的玩法体验，或报告遇到的问题。</p>
+      </div>
+
+      <div class="comments__gate" data-comment-gate hidden>
+        <p>留言需要先登录（仅支持邮箱）。</p>
+        <button class="btn btn--primary" type="button" data-open-auth>登录 / 注册</button>
+      </div>
+
+      <form class="comments__form" data-comment-form hidden>
+        <label class="field">
+          <span class="field__label">昵称（可选）</span>
+          <input class="field__input" type="text" name="nickname" maxlength="24"
+                 autocomplete="nickname" placeholder="不填则显示为匿名访客">
+        </label>
+        <label class="field">
+          <span class="field__label">留言内容</span>
+          <textarea class="field__input field__input--area" name="body" rows="3"
+                    maxlength="500" required
+                    placeholder="例如：这个 Mod 装在 V0.28 上跑通了，投石车扔出来的舞王很带感。"></textarea>
+        </label>
+        <div class="comments__actions">
+          <button class="btn btn--primary" type="submit">发布留言</button>
+          <button class="btn" type="button" data-sign-out>退出登录</button>
+        </div>
+      </form>
+
+      <ul class="comments__list" data-comment-list></ul>
+    </div>
+  </section>
+
+  <!-- 登录面板（邮箱验证码 / 邮箱+密码），默认隐藏 -->
+  <div class="auth-panel" data-auth-panel hidden role="dialog" aria-modal="true"
+       aria-labelledby="auth-title">
+    <div class="auth-panel__box">
+      <button class="auth-panel__close" type="button" data-close-auth aria-label="关闭">×</button>
+      <h2 id="auth-title" class="auth-panel__title">登录 / 注册</h2>
+      <p class="auth-panel__hint">仅支持邮箱登录。首次登录会自动创建账号。</p>
+
+      <div class="auth-panel__tabs" role="tablist">
+        <button class="auth-panel__tab" type="button" role="tab"
+                data-auth-tab="otp" aria-selected="true">邮箱验证码</button>
+        <button class="auth-panel__tab" type="button" role="tab"
+                data-auth-tab="pwd" aria-selected="false">邮箱 + 密码</button>
+      </div>
+
+      <p class="auth-panel__msg" data-auth-msg aria-live="polite"></p>
+
+      <div class="auth-panel__pane" data-auth-pane="otp">
+        <form data-verify-form>
+          <label class="field">
+            <span class="field__label">邮箱</span>
+            <input class="field__input" type="email" name="email" autocomplete="email"
+                   placeholder="you@example.com" required>
+          </label>
+          <div class="auth-panel__row">
+            <button class="btn" type="button" data-send-code>获取验证码</button>
+          </div>
+          <label class="field">
+            <span class="field__label">验证码</span>
+            <input class="field__input" type="text" name="code" inputmode="numeric"
+                   autocomplete="one-time-code" placeholder="6 位数字" required>
+          </label>
+          <label class="field" data-password-wrap hidden>
+            <span class="field__label">密码（仅新账号需要）</span>
+            <input class="field__input" type="password" name="password"
+                   autocomplete="new-password" minlength="6" placeholder="至少 6 位">
+          </label>
+          <button class="btn btn--primary" type="submit">登录 / 注册</button>
+        </form>
+      </div>
+
+      <div class="auth-panel__pane" data-auth-pane="pwd" hidden>
+        <form data-password-form>
+          <label class="field">
+            <span class="field__label">邮箱</span>
+            <input class="field__input" type="email" name="email" autocomplete="email" required>
+          </label>
+          <label class="field">
+            <span class="field__label">密码</span>
+            <input class="field__input" type="password" name="password"
+                   autocomplete="current-password" required>
+          </label>
+          <button class="btn btn--primary" type="submit">登录</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
   <section class="related" aria-labelledby="rel-title">
     <h2 id="rel-title" class="related__title">同类 Mod</h2>
     <div class="catalog reveal-group">
 
-      <article class="tile reveal">
+      <article class="tile reveal" data-mod-card="supergatlingpaper">
         <a class="tile__media" href="supergatlingpaper.html" aria-label="超级机枪读报僵尸 详情">
           <img src="../assets/img/covers/supergatlingpaper.png" alt="超级机枪读报僵尸 — 戴头盔护目镜的读报僵尸，手持报纸并装配机枪炮口" loading="lazy" width="512" height="512">
           
@@ -92,12 +205,12 @@
             <tr><th>体积</th><td>177.1 KB</td></tr>
           </dl>
           <div class="detail__actions" style="margin-top:var(--sp-3)">
-            <a class="btn btn--primary" href="supergatlingpaper.html">查看详情</a>
-            <a class="btn" href="https://github.com/josnil/pvz-mods/releases/latest/download/超级机枪读报僵尸.pmod" download>下载 .pmod · 177.1 KB</a>
+            <a class="btn" href="supergatlingpaper.html">查看详情</a>
+            <a class="btn btn--primary" href="https://pan.quark.cn/s/aae6cedcf4dc" target="_blank" rel="noopener">夸克网盘下载</a>
           </div>
         </div>
       </article>
-      <article class="tile reveal">
+      <article class="tile reveal" data-mod-card="sunflowerqueenzombie">
         <a class="tile__media" href="sunflowerqueenzombie.html" aria-label="向日葵女王僵尸 详情">
           <img src="../assets/img/covers/sunflowerqueenzombie.png" alt="向日葵女王僵尸 — 戴金色王冠的向日葵头，配火焰迪斯科身体，脚踩火焰光环" loading="lazy" width="512" height="512">
           
@@ -114,8 +227,30 @@
             <tr><th>体积</th><td>25.7 KB</td></tr>
           </dl>
           <div class="detail__actions" style="margin-top:var(--sp-3)">
-            <a class="btn btn--primary" href="sunflowerqueenzombie.html">查看详情</a>
-            <a class="btn" href="https://github.com/josnil/pvz-mods/releases/latest/download/向日葵女王僵尸.pmod" download>下载 .pmod · 25.7 KB</a>
+            <a class="btn" href="sunflowerqueenzombie.html">查看详情</a>
+            <a class="btn btn--primary" href="https://pan.quark.cn/s/05b35a3625e2" target="_blank" rel="noopener">夸克网盘下载</a>
+          </div>
+        </div>
+      </article>
+      <article class="tile reveal" data-mod-card="nailongzombie">
+        <a class="tile__media" href="nailongzombie.html" aria-label="奶龙僵尸 详情">
+          <img src="../assets/img/covers/nailongzombie.png" alt="奶龙僵尸 — 黄色圆润的奶龙捧腹大笑形象，闭眼张嘴、双手捂着肚子" loading="lazy" width="512" height="512">
+          
+        </a>
+        <div class="tile__body">
+          <div class="tags"><span class="tag">控场</span><span class="tag">大笑</span><span class="tag">僵直</span><span class="tag">音效</span><span class="tag">托管插件</span></div>
+          <h2 class="tile__title">
+            <a href="nailongzombie.html">奶龙僵尸</a>
+          </h2>
+          <p class="tile__desc">普通僵尸的移动 / 啃食 / 受击 / 死亡，外加大笑控场：出场后每 10 秒大笑一次，切到大笑形象并播奶龙笑声，一边笑一边照常往前冲；全场植物被笑得僵直 3 秒、完全无法发射子弹。</p>
+          <dl class="stats-table" style="margin-top:var(--sp-2)">
+            <tr><th>卡片</th><td>普通卡</td></tr>
+            <tr><th>版本</th><td>v1.0.0</td></tr>
+            <tr><th>体积</th><td>809.2 KB</td></tr>
+          </dl>
+          <div class="detail__actions" style="margin-top:var(--sp-3)">
+            <a class="btn" href="nailongzombie.html">查看详情</a>
+            <a class="btn btn--primary" href="https://pan.quark.cn/s/f7aeb4a298fe" target="_blank" rel="noopener">夸克网盘下载</a>
           </div>
         </div>
       </article>

@@ -27,19 +27,105 @@
   display: flex;
   flex-direction: column;
   gap: var(--sp-5);
+  position: relative;
 }
 
-/* 巨型排版：逐行错位，奇数行靠左、偶数行靠右 */
+/* 巨型排版：逐行错位，奇数行靠左、偶数行靠右
+   ───────────────────────────────────────────────────────────
+   ★ 两层结构（见 index.html 注释）：
+     .hero__line —— 只负责布局与**入场**（reveal-up 由 .reveal-group 下发）
+     .hero__word —— 只负责**常驻浮动** + 字面质感
+     两个动画分属不同元素 ⇒ 不存在 animation 简写互相覆盖的问题。
+
+   ★ 浮动口径：不是整块一起上下跳（那反而更呆板），而是**每个词各自浮动**：
+     ① 每行套一个 --delay 相位错开，同一时刻处在不同高度
+     ② 幅度、周期都略有差异（--amp / --dur），避免机械同步
+     ③ 叠加一点点水平漂移，让"浮动"有呼吸感而非电梯感
+   ⚠️ 只动 transform ⇒ 全程走合成器线程，不触发重排，零掉帧风险。 */
 .hero__display {
   font-family: var(--font-display);
   font-size: var(--text-hero);
-  font-weight: var(--fw-light);
+  /* ★ 用 200 字重（比原来的 300 更细）+ 更紧字距，
+     巨型字号下笔画更挺、更像"高级时装杂志"的标题。
+     机器上有 Noto Sans SC 变体字体 ⇒ 200 是**真实字重**，非合成。 */
+  font-weight: var(--fw-display);
   line-height: var(--lh-hero);
   letter-spacing: var(--ls-hero);
+  /* 可变字重的浏览器能吃到光学尺寸；不支持的忽略这行 */
+  font-optical-sizing: auto;
+  /* ★ 禁止合成字重/斜体：宁可用已有的最接近字重，也不要浏览器糊一个假的 */
+  font-synthesis: none;
+  text-wrap: balance;
+  position: relative;
+  z-index: 1;
 }
+
+/* 外层：纯布局层。必须是 block 才能让四行各自成行，
+   也才能让 --end 行的 text-align 生效 */
 .hero__line { display: block; }
+
+/* 内层：真正承载字面与浮动的那一层 */
+.hero__word {
+  display: inline-block;   /* ★ 必须：inline 元素不接受 transform */
+  /* 每词独立浮动；--dur 逐行覆写，兜底 9s */
+  animation: hero-float var(--dur, 9s) var(--ease-in-out) infinite;
+  animation-delay: var(--delay, 0s);
+  will-change: transform;
+  transform-origin: center 60%;
+
+  /* ── 字面质感 ──────────────────────────────────────────
+     ★ 渐变填充 = 零下载成本换"高级感"：
+       上端纯白 → 中段微冷 → 下端淡蓝紫，巨型字号下能明显看出
+       "笔画有光在走"，这是单色白字给不了的。
+     ⚠️ 用 background-clip:text 时**不能再用 text-shadow** 做光晕 ——
+        字形填充是透明的，阴影会从字里透出来变成一团脏影。
+        改用 filter: drop-shadow（作用在"渲染后的结果"上，与渐变共存），
+        并为动画做兜底：低端设备上宁可不要光晕也不能掉帧。 */
+  background-image: linear-gradient(
+    172deg,
+    #ffffff 0%,
+    #eef2ff 38%,
+    #cfd9ff 68%,
+    #9fb0ff 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 34px rgba(0, 3, 12, 0.62));
+}
+
+/* 拉丁词单独放宽字距：中文负字距套在英文上会挤 */
+.hero__word--latin {
+  letter-spacing: -0.005em;
+}
+
+/* 逐行错开：相位/幅度/周期三者都不同，才像"飘"而不是"排队跳"
+   （delay 取负值 = 直接从周期中段开始，入场那一刻就已经错开了相位，
+     不会出现"先静止再突然开始动"的跳变） */
+.hero__line:nth-child(1) .hero__word { --amp: 1;    --dur: 9s;    --delay: 0s; }
+.hero__line:nth-child(2) .hero__word { --amp: 0.72; --dur: 11.2s; --delay: -3.14s; }
+.hero__line:nth-child(3) .hero__word { --amp: 1.22; --dur: 8.4s;  --delay: -4.62s; }
+.hero__line:nth-child(4) .hero__word { --amp: 0.58; --dur: 12.6s; --delay: -9.83s; }
+
+@keyframes hero-float {
+  0%, 100% {
+    transform: translate3d(0, calc(var(--float-amp) * var(--amp) * -1), 0);
+  }
+  50% {
+    transform: translate3d(calc(var(--float-amp-2) * var(--amp) * 0.5),
+                           calc(var(--float-amp) * var(--amp)), 0);
+  }
+}
+
 @media (min-width: 50.625em) {
-  .hero__line--end { align-self: flex-end; text-align: end; }
+  .hero__line--end { text-align: end; }
+}
+
+/* 小屏：浮动幅度收一半，避免大字撞到相邻元素 */
+@media (max-width: 35.99em) {
+  :root { --float-amp: 5px; --float-amp-2: 3px; }
+  .hero__display { font-size: clamp(2.6rem, 15vw, 4.4rem); }
 }
 
 .hero__lede {
@@ -47,6 +133,9 @@
   font-size: var(--text-lg);
   line-height: 1.7;
   color: var(--color-fg-muted);
+  text-shadow: 0 0 22px rgba(3, 3, 12, 0.7);
+  position: relative;
+  z-index: 1;
 }
 
 .hero__scroll {
@@ -58,6 +147,8 @@
   font-size: var(--text-sm);
   color: var(--color-fg-subtle);
   transition: color var(--dur-fast) var(--ease-out);
+  position: relative;
+  z-index: 1;
 }
 .hero__scroll:hover { color: var(--color-fg); }
 .hero__arrow { animation: bob 2s var(--ease-in-out) infinite; }
@@ -70,6 +161,8 @@
   margin-top: var(--sp-6);
   padding-top: var(--sp-5);
   border-top: 1px solid var(--glass-3);
+  position: relative;
+  z-index: 1;
 }
 .hero__stat { display: flex; flex-direction: column; gap: 2px; }
 .hero__stat-num {
@@ -320,4 +413,7 @@
   .marquee__track { animation: none !important; }
   .marquee { flex-wrap: wrap; }
   .hero__arrow { animation: none !important; }
+  /* ★ 标题停在静态位（不回落到"整块位移"），保证排版基线可预测。
+     只关内层的浮动，别动外层 —— 外层还要跑入场动画。 */
+  .hero__word { animation: none !important; transform: none !important; }
 }

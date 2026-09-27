@@ -137,9 +137,69 @@ MODS = [
                     '内置 pmod 规范校验，防止产出坏包'],
          cover_static='mod-editor.png', cover_frames=0,
          cover_alt='Mod 图形编辑器 — 深色界面的 Mod 属性编辑与打包工具截图'),
+
+    # ── 新增（2026-09-27）：豌豆强化 / 奶龙僵尸 / 潘多拉泳池 ──
+    dict(id='peaoverhaul', name='豌豆强化', category='plant',
+         card_type='NORMAL', card_class='覆盖型', version='1.0.0',
+         size=3212, pkg='PeaOverhaul.pmod',
+         desc='放大豌豆类子弹并提升伤害与穿透：一次覆盖 PeaDefault / SnowPea / FirePea / GoldPea 四种子弹，子弹 scale 提到 1.6 倍、穿透 8 个。演示型 Mod，适合作为「覆盖内置资源」的模板。',
+         tags=['覆盖', '子弹', '穿透', '模板'],
+         stats=[('覆盖子弹', '4 种'), ('弹药 scale', '1.6×'), ('穿透数', '8'),
+                ('火焰弹伤害', '120'), ('是否含插件', '否'), ('体积', '3.1 KB')],
+         mechanics=['overrides.Projectile = [PeaDefault, SnowPea, FirePea, GoldPea]',
+                    '全部走「覆盖内置资源」，不新增任何角色或卡片',
+                    '子弹尺寸 scale = (1.6, 1.6)，穿透 penetrateNum = 8',
+                    'FirePea 伤害 120、damageFlags = 7、爆破粒子走 FireSplats',
+                    '无托管运行时插件（runtimeAssembly 为空）'],
+         cover_static='peaoverhaul.png', cover_frames=0,
+         cover_alt='豌豆强化 — 四颗被放大的豌豆子弹（普通绿豌豆 / 寒冰蓝豌豆 / 火焰豌豆 / 金色豌豆）'),
+    dict(id='nailongzombie', name='奶龙僵尸', category='zombie',
+         card_type='NORMAL', card_class='普通卡', version='1.0.0',
+         size=828651, pkg='奶龙僵尸.pmod',
+         desc='普通僵尸的移动 / 啃食 / 受击 / 死亡，外加大笑控场：出场后每 10 秒大笑一次，切到大笑形象并播奶龙笑声，一边笑一边照常往前冲；全场植物被笑得僵直 3 秒、完全无法发射子弹。',
+         tags=['控场', '大笑', '僵直', '音效', '托管插件'],
+         stats=[('大笑间隔', '10s'), ('僵直时长', '3s'), ('僵直效果', '禁止发射'),
+                ('形态', '2 套形象'), ('音效', '奶龙笑声'), ('体积', '809 KB')],
+         mechanics=['大笑时切换到「捧腹大笑」形象，播 nailong_laugh.wav',
+                    '大笑期间照常前进，不打断移动',
+                    '全场植物僵直 3 秒，发射被完全封锁（含射手类）',
+                    'provide：Audio / Character / CharacterSprite / Packet 各 1 项',
+                    '托管运行时：Runtime/ModAssembly.dll（入口 NaiLongRuntimeEntry）'],
+         cover_static='nailongzombie.png', cover_frames=0,
+         cover_alt='奶龙僵尸 — 黄色圆润的奶龙捧腹大笑形象，闭眼张嘴、双手捂着肚子'),
+    dict(id='pandorapool', name='潘多拉泳池', category='other',
+         card_type='MAP', card_class='地图', version='1.1.0',
+         size=14287, pkg='潘多拉泳池.pmod',
+         desc='泳池自选卡关卡：初始阳光 1500，开局即出戴夫博士（0.45 倍血 144000），普通/路障/铁桶僵尸源源不断（15 波），击败博士并清空全场才算胜利。命运选项框每 25 秒弹出，选「衰老」则 45 秒内无法使用铲子。',
+         tags=['关卡', '泳池', 'BOSS', '命运选项', '托管插件'],
+         stats=[('初始阳光', '1500'), ('BOSS 血量', '144000'), ('BOSS 倍率', '0.45×'),
+                ('波数', '15'), ('选项框间隔', '25s'), ('胜利条件', '击败博士 + 清场')],
+         mechanics=['地图 = Backyard（泳池），种子库为「自选卡」（SeedBank.METHOD = CHOOSE）',
+                    '开局即生成戴夫博士，血量按内置值 × 0.45 = 144000',
+                    '15 波僵尸：普通 / 路障 / 铁桶',
+                    '命运选项框每 25 秒弹出，标题「选择你的命运吧！」',
+                    '选中「衰老」⇒ 45 秒内无法使用铲子；不选择则流程不受影响',
+                    'provide：Level = PandoraCatalog',
+                    '托管运行时：Runtime/ModAssembly.dll（入口 PandoraLevelRuntimeEntry）'],
+         cover_static='pandorapool.jpg', cover_frames=0,
+         cover_alt='潘多拉泳池 — 官方后院泳池关卡俯视图，蓝色泳池配木栈道、遮阳伞与烤炉'),
 ]
 
 DL_BASE = 'https://github.com/josnil/pvz-mods/releases/latest/download'
+
+# 夸克网盘 —— 与 assets/js/mods.js 的 QUARK / QUARK_ALL 同源（脚本末尾自检）
+QUARK_ALL = 'https://pan.quark.cn/s/eca3724f6450'
+QUARK = {
+    'supergatlingpea': 'https://pan.quark.cn/s/3e3b62402dfd',
+    'ultimatecherrygod': 'https://pan.quark.cn/s/f8cacc624df8',
+    'supergatlingpaper': 'https://pan.quark.cn/s/aae6cedcf4dc',
+    'sunflowerqueenzombie': 'https://pan.quark.cn/s/05b35a3625e2',
+    'discogargantuarpult': 'https://pan.quark.cn/s/1bd55f3d58f6',
+    'vampirepool': 'https://pan.quark.cn/s/7ecbb59a05cc',
+    'peaoverhaul': 'https://pan.quark.cn/s/05e3ee9fe1e3',
+    'nailongzombie': 'https://pan.quark.cn/s/f7aeb4a298fe',
+    'pandorapool': 'https://pan.quark.cn/s/b9c9a19766c6',
+}
 
 CAT_BY_KEY = {c['key']: c for c in CATEGORIES}
 
@@ -171,6 +231,15 @@ def download_url(m):
     return '%s/%s' % (DL_BASE, m['pkg']) if m['pkg'] else ''
 
 
+def quark_url(m):
+    return QUARK.get(m['id'], '')
+
+
+def primary_url(m):
+    """卡片点击的默认去向：夸克优先，回退 GitHub，最后详情页。"""
+    return quark_url(m) or download_url(m) or ('mod/%s.html' % m['id'])
+
+
 # ══════════════════════════════════════════════════════════════
 # 公共 HTML 片段
 # ══════════════════════════════════════════════════════════════
@@ -183,6 +252,7 @@ HEAD = '''<!DOCTYPE html>
 <title>{title}</title>
 <meta name="description" content="{desc}">
 <meta name="color-scheme" content="dark">
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="icon" type="image/png" sizes="32x32" href="{u}assets/img/favicon-32.png">
 <link rel="apple-touch-icon" href="{u}assets/img/apple-touch-icon.png">
 <link rel="stylesheet" href="{u}assets/css/tokens.css">
@@ -251,17 +321,24 @@ def catalog_card(m, depth=0):
             '</span>' % (m['cover_frames'], u))
 
     dl = download_url(m)
-    dl_html = (
-        '<a class="btn" href="%s" download>下载 .pmod · %s</a>'
-        % (dl, fmt_size(m['size'])) if dl
-        else '<span class="btn" aria-disabled="true">联系作者获取</span>')
+    qu = quark_url(m)
+    # 主按钮走夸克（用户要求「点击默认跳转夸克链接」），无夸克才回退 GitHub
+    if qu:
+        dl_html = ('<a class="btn btn--primary" href="%s" target="_blank" '
+                   'rel="noopener">夸克网盘下载</a>' % qu)
+    elif dl:
+        dl_html = ('<a class="btn btn--primary" href="%s" download>下载 .pmod · %s</a>'
+                   % (dl, fmt_size(m['size'])))
+    else:
+        dl_html = '<span class="btn" aria-disabled="true">联系作者获取</span>'
 
     return '''
-      <article class="tile reveal">
-        <a class="tile__media"%s href="%s" aria-label="%s 详情">
+      <article class="tile reveal" data-mod-card="%s">
+        <a class="tile__media"%s href="%s" aria-label="%s 详情">''' % (
+        m['id'], frames_attr, href_detail, esc(m['name'])) + '''
           <img src="%sassets/img/covers/%s" alt="%s" loading="lazy" width="512" height="512">
           %s
-        </a>
+        </a>''' % (u, m['cover_static'], esc(m['cover_alt']), frames_html) + '''
         <div class="tile__body">
           <div class="tags">%s</div>
           <h2 class="tile__title">
@@ -274,13 +351,11 @@ def catalog_card(m, depth=0):
             <tr><th>体积</th><td>%s</td></tr>
           </dl>
           <div class="detail__actions" style="margin-top:var(--sp-3)">
-            <a class="btn btn--primary" href="%s">查看详情</a>
+            <a class="btn" href="%s">查看详情</a>
             %s
           </div>
         </div>
       </article>''' % (
-        frames_attr, href_detail, esc(m['name']),
-        u, m['cover_static'], esc(m['cover_alt']), frames_html,
         ''.join('<span class="tag">%s</span>' % esc(t) for t in m['tags']),
         href_detail, esc(m['name']), esc(m['desc']),
         m['card_class'], m['version'], fmt_size(m['size']),
@@ -339,6 +414,37 @@ def build_category_page(cat):
 def build_detail_page(m):
     cat = CAT_BY_KEY[m['category']]
     dl = download_url(m)
+    qu = quark_url(m)
+
+    # ── 详情页下载区：夸克 + GitHub 双链接（用户明确要求两者都给）──
+    # 无 .pmod 包的工具类（pkg 为空）不给「下载」按钮，只给仓库/总盘入口。
+    dl_parts = []
+    if qu:
+        dl_parts.append(
+            '<a class="btn btn--primary btn--lg" href="%s" target="_blank" '
+            'rel="noopener">夸克网盘下载</a>' % qu)
+    if dl:
+        dl_parts.append(
+            '<a class="btn btn--lg" href="%s" download>GitHub 下载 %s（%s）</a>'
+            % (dl, esc(m['pkg']), fmt_size(m['size'])))
+    if not dl_parts:
+        dl_parts.append('<a class="btn btn--lg" href="#">联系作者获取</a>')
+    dl_html = ''.join(dl_parts)
+
+    # 抽屉式说明：写清两个来源的关系，避免用户疑惑该点哪个
+    dual_note = (
+        '<p class="detail__dl-note">'
+        '两个来源内容一致：<b>夸克网盘</b>免登录、国内直连，推荐；'
+        '<b>GitHub</b> 为原始发布源，海外或需版本追溯时使用。'
+        '</p>' if (qu and dl) else '')
+
+    repo_html = (
+        '<a class="btn btn--lg" href="%s" target="_blank" rel="noopener">在 GitHub 查看</a>'
+        % DL_BASE.replace('/releases/latest/download', ''))
+
+    quark_all_html = (
+        '<a class="btn btn--lg" href="%s" target="_blank" rel="noopener">'
+        '夸克网盘 · 全部 Mod</a>' % QUARK_ALL)
 
     has_frames = m['cover_frames'] > 1
     if has_frames:
@@ -356,11 +462,6 @@ def build_detail_page(m):
         for k, v in m['stats'])
 
     mech_items = ''.join('<li>%s</li>' % esc(x) for x in m['mechanics'])
-
-    dl_html = (
-        '<a class="btn btn--primary btn--lg" href="%s" download>下载 %s（%s）</a>'
-        % (dl, esc(m['pkg']), fmt_size(m['size'])) if dl
-        else '<a class="btn btn--lg" href="#">联系作者获取</a>')
 
     repo_html = (
         '<a class="btn btn--lg" href="%s" target="_blank" rel="noopener">在 GitHub 查看</a>'
@@ -425,13 +526,125 @@ def build_detail_page(m):
         <ul class="detail__list">%s</ul>
       </div>
 
+      <div class="detail__block" data-download-block>
+        <h2>下载</h2>
+        <div class="detail__actions">
+          %s
+        </div>
+        %s
+      </div>
+
       <div class="detail__actions">
         %s
         %s
       </div>
 
+      <div class="detail__block" data-cloud-detail="%s">
+        <div class="like-row">
+          <button class="like-btn" type="button" data-like-btn="%s"
+                  data-count="0" data-liked="false" aria-pressed="false">
+            <span class="like-btn__heart" aria-hidden="true">♡</span>
+            <span class="like-btn__num">0</span>
+            <span class="like-btn__text">点赞</span>
+          </button>
+          <span class="like-row__hint">喜欢这个 Mod？点个赞让作者知道。</span>
+        </div>
+      </div>
+
     </div>
   </section>
+
+  <section class="comments-wrap" aria-labelledby="cm-title">
+    <div class="layout" style="max-width:820px" data-comments="%s">
+      <div class="comments__head">
+        <h2 id="cm-title" class="h2">留言 <span class="comments__count" data-comment-count>0</span></h2>
+        <p class="comments__lead">说说你的玩法体验，或报告遇到的问题。</p>
+      </div>
+
+      <div class="comments__gate" data-comment-gate hidden>
+        <p>留言需要先登录（仅支持邮箱）。</p>
+        <button class="btn btn--primary" type="button" data-open-auth>登录 / 注册</button>
+      </div>
+
+      <form class="comments__form" data-comment-form hidden>
+        <label class="field">
+          <span class="field__label">昵称（可选）</span>
+          <input class="field__input" type="text" name="nickname" maxlength="24"
+                 autocomplete="nickname" placeholder="不填则显示为匿名访客">
+        </label>
+        <label class="field">
+          <span class="field__label">留言内容</span>
+          <textarea class="field__input field__input--area" name="body" rows="3"
+                    maxlength="500" required
+                    placeholder="例如：这个 Mod 装在 V0.28 上跑通了，投石车扔出来的舞王很带感。"></textarea>
+        </label>
+        <div class="comments__actions">
+          <button class="btn btn--primary" type="submit">发布留言</button>
+          <button class="btn" type="button" data-sign-out>退出登录</button>
+        </div>
+      </form>
+
+      <ul class="comments__list" data-comment-list></ul>
+    </div>
+  </section>
+
+  <!-- 登录面板（邮箱验证码 / 邮箱+密码），默认隐藏 -->
+  <div class="auth-panel" data-auth-panel hidden role="dialog" aria-modal="true"
+       aria-labelledby="auth-title">
+    <div class="auth-panel__box">
+      <button class="auth-panel__close" type="button" data-close-auth aria-label="关闭">×</button>
+      <h2 id="auth-title" class="auth-panel__title">登录 / 注册</h2>
+      <p class="auth-panel__hint">仅支持邮箱登录。首次登录会自动创建账号。</p>
+
+      <div class="auth-panel__tabs" role="tablist">
+        <button class="auth-panel__tab" type="button" role="tab"
+                data-auth-tab="otp" aria-selected="true">邮箱验证码</button>
+        <button class="auth-panel__tab" type="button" role="tab"
+                data-auth-tab="pwd" aria-selected="false">邮箱 + 密码</button>
+      </div>
+
+      <p class="auth-panel__msg" data-auth-msg aria-live="polite"></p>
+
+      <div class="auth-panel__pane" data-auth-pane="otp">
+        <form data-verify-form>
+          <label class="field">
+            <span class="field__label">邮箱</span>
+            <input class="field__input" type="email" name="email" autocomplete="email"
+                   placeholder="you@example.com" required>
+          </label>
+          <div class="auth-panel__row">
+            <button class="btn" type="button" data-send-code>获取验证码</button>
+          </div>
+          <label class="field">
+            <span class="field__label">验证码</span>
+            <input class="field__input" type="text" name="code" inputmode="numeric"
+                   autocomplete="one-time-code" placeholder="6 位数字" required>
+          </label>
+          <label class="field" data-password-wrap hidden>
+            <span class="field__label">密码（仅新账号需要）</span>
+            <input class="field__input" type="password" name="password"
+                   autocomplete="new-password" minlength="6" placeholder="至少 6 位">
+          </label>
+          <button class="btn btn--primary" type="submit">登录 / 注册</button>
+        </form>
+      </div>
+
+      <div class="auth-panel__pane" data-auth-pane="pwd" hidden>
+        <form data-password-form>
+          <label class="field">
+            <span class="field__label">邮箱</span>
+            <input class="field__input" type="email" name="email" autocomplete="email" required>
+          </label>
+          <label class="field">
+            <span class="field__label">密码</span>
+            <input class="field__input" type="password" name="password"
+                   autocomplete="current-password" required>
+          </label>
+          <button class="btn btn--primary" type="submit">登录</button>
+        </form>
+      </div>
+    </div>
+  </div>
 %s
 </main>
 ''' % (
@@ -448,7 +661,10 @@ def build_detail_page(m):
         esc(m['desc']),
         '云漫行', m['version'], m['card_class'], fmt_size(m['size']),
         esc(cat['name']),
-        stats_rows, mech_items, dl_html, repo_html,
+        stats_rows, mech_items,
+        dl_html, dual_note,            # ← 下载块：双链接 + 说明
+        repo_html, quark_all_html,     # ← 次行：仓库 + 全部 Mod 总盘
+        m['id'], m['id'], m['id'],
         related_html,
     )
 
@@ -482,6 +698,13 @@ def check_against_modsjs():
             continue
         if not any(m['id'] == jid for m in MODS):
             errs.append('本脚本缺少 id=%s（mods.js 有）' % jid)
+
+    # 夸克链接双向对齐：本脚本 vs mods.js
+    if QUARK_ALL not in js:
+        errs.append('mods.js 缺少 QUARK_ALL=%s' % QUARK_ALL)
+    for mid, url in QUARK.items():
+        if url not in js:
+            errs.append('mods.js 缺少夸克链接 %s → %s' % (mid, url))
     return errs
 
 

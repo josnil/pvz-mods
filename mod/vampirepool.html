@@ -6,6 +6,7 @@
 <title>吸血鬼屋泳池 — 植物大战僵尸杂交版 Mod</title>
 <meta name="description" content="以「吸血鬼屋」为基底继承全部特性（夜晚 / 无天降阳光 / 吸血规则 / 昼夜元素格），行数由 5 扩到 6，并把第 4~5 行 × 第 1~9 列设为血池。">
 <meta name="color-scheme" content="dark">
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="icon" type="image/png" sizes="32x32" href="../assets/img/favicon-32.png">
 <link rel="apple-touch-icon" href="../assets/img/apple-touch-icon.png">
 <link rel="stylesheet" href="../assets/css/tokens.css">
@@ -63,19 +64,131 @@
         <ul class="detail__list"><li>继承吸血鬼屋：夜晚场景、无天降阳光、吸血规则、昼夜元素格</li><li>行数 5 → 6，扩展出第 6 行种植区</li><li>第 4~5 行 × 第 1~9 列 = 血池（共 18 格），需种睡莲</li><li>背景贴图走托管运行时替换（血池版）</li><li>MAPS 字典 key = VampirePool，走 provides 而非 overrides</li></ul>
       </div>
 
+      <div class="detail__block" data-download-block>
+        <h2>下载</h2>
+        <div class="detail__actions">
+          <a class="btn btn--primary btn--lg" href="https://pan.quark.cn/s/7ecbb59a05cc" target="_blank" rel="noopener">夸克网盘下载</a><a class="btn btn--lg" href="https://github.com/josnil/pvz-mods/releases/latest/download/吸血鬼屋泳池.pmod" download>GitHub 下载 吸血鬼屋泳池.pmod（319.8 KB）</a>
+        </div>
+        <p class="detail__dl-note">两个来源内容一致：<b>夸克网盘</b>免登录、国内直连，推荐；<b>GitHub</b> 为原始发布源，海外或需版本追溯时使用。</p>
+      </div>
+
       <div class="detail__actions">
-        <a class="btn btn--primary btn--lg" href="https://github.com/josnil/pvz-mods/releases/latest/download/吸血鬼屋泳池.pmod" download>下载 吸血鬼屋泳池.pmod（319.8 KB）</a>
         <a class="btn btn--lg" href="https://github.com/josnil/pvz-mods" target="_blank" rel="noopener">在 GitHub 查看</a>
+        <a class="btn btn--lg" href="https://pan.quark.cn/s/eca3724f6450" target="_blank" rel="noopener">夸克网盘 · 全部 Mod</a>
+      </div>
+
+      <div class="detail__block" data-cloud-detail="vampirepool">
+        <div class="like-row">
+          <button class="like-btn" type="button" data-like-btn="vampirepool"
+                  data-count="0" data-liked="false" aria-pressed="false">
+            <span class="like-btn__heart" aria-hidden="true">♡</span>
+            <span class="like-btn__num">0</span>
+            <span class="like-btn__text">点赞</span>
+          </button>
+          <span class="like-row__hint">喜欢这个 Mod？点个赞让作者知道。</span>
+        </div>
       </div>
 
     </div>
   </section>
 
+  <section class="comments-wrap" aria-labelledby="cm-title">
+    <div class="layout" style="max-width:820px" data-comments="vampirepool">
+      <div class="comments__head">
+        <h2 id="cm-title" class="h2">留言 <span class="comments__count" data-comment-count>0</span></h2>
+        <p class="comments__lead">说说你的玩法体验，或报告遇到的问题。</p>
+      </div>
+
+      <div class="comments__gate" data-comment-gate hidden>
+        <p>留言需要先登录（仅支持邮箱）。</p>
+        <button class="btn btn--primary" type="button" data-open-auth>登录 / 注册</button>
+      </div>
+
+      <form class="comments__form" data-comment-form hidden>
+        <label class="field">
+          <span class="field__label">昵称（可选）</span>
+          <input class="field__input" type="text" name="nickname" maxlength="24"
+                 autocomplete="nickname" placeholder="不填则显示为匿名访客">
+        </label>
+        <label class="field">
+          <span class="field__label">留言内容</span>
+          <textarea class="field__input field__input--area" name="body" rows="3"
+                    maxlength="500" required
+                    placeholder="例如：这个 Mod 装在 V0.28 上跑通了，投石车扔出来的舞王很带感。"></textarea>
+        </label>
+        <div class="comments__actions">
+          <button class="btn btn--primary" type="submit">发布留言</button>
+          <button class="btn" type="button" data-sign-out>退出登录</button>
+        </div>
+      </form>
+
+      <ul class="comments__list" data-comment-list></ul>
+    </div>
+  </section>
+
+  <!-- 登录面板（邮箱验证码 / 邮箱+密码），默认隐藏 -->
+  <div class="auth-panel" data-auth-panel hidden role="dialog" aria-modal="true"
+       aria-labelledby="auth-title">
+    <div class="auth-panel__box">
+      <button class="auth-panel__close" type="button" data-close-auth aria-label="关闭">×</button>
+      <h2 id="auth-title" class="auth-panel__title">登录 / 注册</h2>
+      <p class="auth-panel__hint">仅支持邮箱登录。首次登录会自动创建账号。</p>
+
+      <div class="auth-panel__tabs" role="tablist">
+        <button class="auth-panel__tab" type="button" role="tab"
+                data-auth-tab="otp" aria-selected="true">邮箱验证码</button>
+        <button class="auth-panel__tab" type="button" role="tab"
+                data-auth-tab="pwd" aria-selected="false">邮箱 + 密码</button>
+      </div>
+
+      <p class="auth-panel__msg" data-auth-msg aria-live="polite"></p>
+
+      <div class="auth-panel__pane" data-auth-pane="otp">
+        <form data-verify-form>
+          <label class="field">
+            <span class="field__label">邮箱</span>
+            <input class="field__input" type="email" name="email" autocomplete="email"
+                   placeholder="you@example.com" required>
+          </label>
+          <div class="auth-panel__row">
+            <button class="btn" type="button" data-send-code>获取验证码</button>
+          </div>
+          <label class="field">
+            <span class="field__label">验证码</span>
+            <input class="field__input" type="text" name="code" inputmode="numeric"
+                   autocomplete="one-time-code" placeholder="6 位数字" required>
+          </label>
+          <label class="field" data-password-wrap hidden>
+            <span class="field__label">密码（仅新账号需要）</span>
+            <input class="field__input" type="password" name="password"
+                   autocomplete="new-password" minlength="6" placeholder="至少 6 位">
+          </label>
+          <button class="btn btn--primary" type="submit">登录 / 注册</button>
+        </form>
+      </div>
+
+      <div class="auth-panel__pane" data-auth-pane="pwd" hidden>
+        <form data-password-form>
+          <label class="field">
+            <span class="field__label">邮箱</span>
+            <input class="field__input" type="email" name="email" autocomplete="email" required>
+          </label>
+          <label class="field">
+            <span class="field__label">密码</span>
+            <input class="field__input" type="password" name="password"
+                   autocomplete="current-password" required>
+          </label>
+          <button class="btn btn--primary" type="submit">登录</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
   <section class="related" aria-labelledby="rel-title">
     <h2 id="rel-title" class="related__title">同类 Mod</h2>
     <div class="catalog reveal-group">
 
-      <article class="tile reveal">
+      <article class="tile reveal" data-mod-card="gemmatch-builder">
         <a class="tile__media" href="gemmatch-builder.html" aria-label="全模式关卡构建器 详情">
           <img src="../assets/img/covers/gemmatch-builder.png" alt="全模式关卡构建器 — 关卡可视化编辑器界面" loading="lazy" width="512" height="512">
           
@@ -92,12 +205,12 @@
             <tr><th>体积</th><td>工具</td></tr>
           </dl>
           <div class="detail__actions" style="margin-top:var(--sp-3)">
-            <a class="btn btn--primary" href="gemmatch-builder.html">查看详情</a>
+            <a class="btn" href="gemmatch-builder.html">查看详情</a>
             <span class="btn" aria-disabled="true">联系作者获取</span>
           </div>
         </div>
       </article>
-      <article class="tile reveal">
+      <article class="tile reveal" data-mod-card="mod-editor">
         <a class="tile__media" href="mod-editor.html" aria-label="Mod 图形编辑器 详情">
           <img src="../assets/img/covers/mod-editor.png" alt="Mod 图形编辑器 — 深色界面的 Mod 属性编辑与打包工具截图" loading="lazy" width="512" height="512">
           
@@ -114,8 +227,30 @@
             <tr><th>体积</th><td>工具</td></tr>
           </dl>
           <div class="detail__actions" style="margin-top:var(--sp-3)">
-            <a class="btn btn--primary" href="mod-editor.html">查看详情</a>
+            <a class="btn" href="mod-editor.html">查看详情</a>
             <span class="btn" aria-disabled="true">联系作者获取</span>
+          </div>
+        </div>
+      </article>
+      <article class="tile reveal" data-mod-card="pandorapool">
+        <a class="tile__media" href="pandorapool.html" aria-label="潘多拉泳池 详情">
+          <img src="../assets/img/covers/pandorapool.jpg" alt="潘多拉泳池 — 官方后院泳池关卡俯视图，蓝色泳池配木栈道、遮阳伞与烤炉" loading="lazy" width="512" height="512">
+          
+        </a>
+        <div class="tile__body">
+          <div class="tags"><span class="tag">关卡</span><span class="tag">泳池</span><span class="tag">BOSS</span><span class="tag">命运选项</span><span class="tag">托管插件</span></div>
+          <h2 class="tile__title">
+            <a href="pandorapool.html">潘多拉泳池</a>
+          </h2>
+          <p class="tile__desc">泳池自选卡关卡：初始阳光 1500，开局即出戴夫博士（0.45 倍血 144000），普通/路障/铁桶僵尸源源不断（15 波），击败博士并清空全场才算胜利。命运选项框每 25 秒弹出，选「衰老」则 45 秒内无法使用铲子。</p>
+          <dl class="stats-table" style="margin-top:var(--sp-2)">
+            <tr><th>卡片</th><td>地图</td></tr>
+            <tr><th>版本</th><td>v1.1.0</td></tr>
+            <tr><th>体积</th><td>14.0 KB</td></tr>
+          </dl>
+          <div class="detail__actions" style="margin-top:var(--sp-3)">
+            <a class="btn" href="pandorapool.html">查看详情</a>
+            <a class="btn btn--primary" href="https://pan.quark.cn/s/b9c9a19766c6" target="_blank" rel="noopener">夸克网盘下载</a>
           </div>
         </div>
       </article>

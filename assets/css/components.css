@@ -16,8 +16,24 @@
   pointer-events: none;         /* ★ 必须，否则挡住所有点击 */
   will-change: transform;
 }
+
+/* 粒子拖尾画布：铺满视口，压在光标之下、内容之上 */
+.cursor-trail {
+  position: fixed;
+  inset: 0;
+  z-index: calc(var(--z-cursor) - 1);
+  width: 100%;
+  height: 100%;
+  display: block;
+  pointer-events: none;         /* ★ 绝不挡点击 */
+  /* 叠加发光，让拖尾有"灯"的感觉 */
+  mix-blend-mode: screen;
+}
+
 @media (hover: none), (pointer: coarse), (prefers-reduced-motion: reduce) {
   .cursor { display: none; }
+  /* ★ 拖尾由 JS 决定是否创建；这里再兜一层，防止运行期切换偏好后残留 */
+  .cursor-trail { display: none; }
 }
 
 /* ═══════ 导航 ═══════ */
@@ -34,9 +50,12 @@
   transition: background-color var(--dur-base) var(--ease-out);
 }
 .nav.is-scrolled {
-  background: rgba(0, 0, 0, 0.72);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  /* ★ 从 0.72 提到 0.86：背景有极光与流星在动，
+     0.72 的模糊底会让导航文字下方的动画持续"闪"进来。 */
+  background: rgba(5, 5, 14, 0.86);
+  backdrop-filter: blur(14px) saturate(1.2);
+  -webkit-backdrop-filter: blur(14px) saturate(1.2);
+  border-bottom: 1px solid var(--glass-1);
 }
 
 .nav__brand {
@@ -112,7 +131,9 @@
   justify-content: center;
   gap: var(--sp-5);
   padding: var(--gutter);
-  background: var(--color-bg);
+  /* ★ 移动端导航抽屉必须**完全不透明**：背景现在是会动的极光 + 流星，
+     半透明抽屉会让底层动画透上来，菜单文字糊在流星光里读不清。 */
+  background: #06060f;
 }
 .nav__drawer[data-open="true"] { display: flex; }
 .nav__drawer a {
@@ -230,7 +251,15 @@ body:has(.nav__drawer[data-open="true"]) .nav__toggle {
   width: var(--card-w);
   height: 100%;                 /* 由外层 .stack__card 的显式高度决定 */
   aspect-ratio: 3 / 4;          /* 扑克牌比例（独立使用时兜底） */
-  background: var(--glass-1);
+  /* ★ 卡面必须是"实体"而非纯半透明：
+     背景现在是渐变 + 极光，若卡面还是 3% 白的玻璃层，
+     卡会跟着背景忽明忽暗、和底影糊在一起，牌堆失去边界。
+     改为"加深的实色 + 一点点透" ⇒ 既能透出背景的氛围，又有明确卡面。 */
+  background: linear-gradient(
+    to bottom,
+    rgba(12, 12, 22, 0.92) 0%,
+    rgba(8, 8, 16, 0.95) 100%
+  );
   border: 1px solid var(--glass-3);
   border-radius: var(--radius-none);   /* ★ 硬边 —— 风格核心 */
   overflow: visible;            /* 浮窗需溢出 */
@@ -329,12 +358,14 @@ body:has(.nav__drawer[data-open="true"]) .nav__toggle {
   animation: sheen 900ms var(--ease-out) 1;
 }
 
-/* 卡底：名称 + 类别 */
+/* 卡底：名称 + 类别
+   ⚠️ 背景必须显式给出、且与 .mod-card 的卡面同色 —— 否则它会露出卡面渐变，
+      在卡底出现一道横向色差。 */
 .mod-card__body {
   flex: 0 0 auto;
   padding: var(--sp-3);
   border-top: 1px solid var(--glass-3);
-  background: var(--color-bg);
+  background: rgba(8, 8, 16, 0.95);
 }
 .mod-card__name {
   font-family: var(--font-display);
@@ -612,4 +643,318 @@ body:has(.nav__drawer[data-open="true"]) .nav__toggle {
 @media (prefers-reduced-motion: reduce) {
   .badge__dot { animation: none; opacity: 1; }
   .mod-card__frames { animation: none !important; }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   云服务 UI：计数徽章 / 点赞 / 留言 / 登录面板 / 提示条
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ─────── 计数徽章（下载 / 点赞）─────── */
+
+.stat-chips {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  margin-top: var(--sp-2);
+  flex-wrap: wrap;
+}
+
+.stat-chip {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.25em;
+  padding: 0.15em 0.55em;
+  border: 1px solid var(--glass-2);
+  border-radius: var(--radius-none);
+  background: var(--glass-1);
+  font-size: var(--text-xs);
+  letter-spacing: var(--ls-label);
+  color: var(--color-fg-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.stat-chip__num {
+  color: var(--color-fg);
+  font-weight: var(--fw-medium);
+}
+
+.detail__meta .stat-chips { width: 100%; margin-top: var(--sp-2); }
+
+/* ─────── 点赞 ─────── */
+
+.like-row {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+  flex-wrap: wrap;
+}
+
+.like-row__hint {
+  font-size: var(--text-sm);
+  color: var(--color-fg-subtle);
+}
+
+.like-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  min-height: 44px;              /* ★ 触控目标 ≥44px */
+  padding: 0 var(--sp-4);
+  border: 1px solid var(--glass-3);
+  border-radius: var(--radius-none);
+  background: transparent;
+  color: var(--color-fg);
+  font-family: inherit;
+  font-size: var(--text-base);
+  cursor: pointer;
+  transition: transform 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.like-btn:hover { transform: scale(1.05); border-color: var(--glass-5); }
+.like-btn:active { transform: scale(0.95); }
+.like-btn:focus-visible { outline: 2px solid var(--brand-400); outline-offset: 3px; }
+
+.like-btn__heart { font-size: 1.25em; line-height: 1; }
+.like-btn__num { font-variant-numeric: tabular-nums; font-weight: var(--fw-medium); }
+
+.like-btn[data-liked="true"] {
+  border-color: var(--brand-400);
+  background: rgba(77, 108, 255, 0.12);
+}
+.like-btn[data-liked="true"] .like-btn__heart { color: var(--brand-400); }
+
+/* 心形弹跳：只动 transform，GPU 加速 */
+@keyframes like-pop {
+  0%   { transform: scale(1); }
+  45%  { transform: scale(1.35); }
+  100% { transform: scale(1); }
+}
+.like-btn[data-liked="true"] .like-btn__heart { animation: like-pop 0.3s ease; }
+
+/* ─────── 留言区 ─────── */
+
+.comments-wrap { padding-block: var(--sp-12); }
+
+.comments__head { margin-bottom: var(--sp-6); }
+
+.comments__count {
+  display: inline-block;
+  margin-left: var(--sp-2);
+  padding: 0.1em 0.5em;
+  border: 1px solid var(--glass-2);
+  background: var(--glass-1);
+  font-size: var(--text-sm);
+  color: var(--color-fg-muted);
+  vertical-align: middle;
+  font-variant-numeric: tabular-nums;
+}
+
+.comments__lead { color: var(--color-fg-muted); margin-top: var(--sp-2); }
+
+.comments__gate {
+  padding: var(--sp-6);
+  border: 1px dashed var(--glass-3);
+  margin-bottom: var(--sp-6);
+}
+.comments__gate p { color: var(--color-fg-muted); margin-bottom: var(--sp-4); }
+
+.comments__form {
+  display: grid;
+  gap: var(--sp-4);
+  padding: var(--sp-5);
+  border: 1px solid var(--glass-2);
+  background: var(--glass-1);
+  margin-bottom: var(--sp-6);
+}
+
+.comments__actions { display: flex; gap: var(--sp-3); flex-wrap: wrap; }
+
+.comments__list {
+  list-style: none;
+  display: grid;
+  gap: var(--sp-3);
+  margin: 0;
+  padding: 0;
+}
+
+.comment {
+  padding: var(--sp-4);
+  border: 1px solid var(--glass-2);
+  background: var(--color-bg-elevated);
+}
+
+.comment__head {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-2);
+  flex-wrap: wrap;
+}
+
+.comment__name { font-weight: var(--fw-medium); }
+
+.comment__time {
+  font-size: var(--text-xs);
+  color: var(--color-fg-subtle);
+  font-variant-numeric: tabular-nums;
+}
+
+.comment__del {
+  margin-left: auto;
+  min-height: 32px;
+  padding: 0 var(--sp-3);
+  border: 1px solid var(--glass-2);
+  background: transparent;
+  color: var(--color-fg-subtle);
+  font-family: inherit;
+  font-size: var(--text-xs);
+  cursor: pointer;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+.comment__del:hover { color: var(--error); border-color: var(--error); }
+
+.comment__body {
+  color: var(--color-fg-muted);
+  line-height: var(--lh-body);
+  white-space: pre-wrap;      /* 保留用户换行，同时不解析 HTML */
+  overflow-wrap: anywhere;
+}
+
+.comment--empty { color: var(--color-fg-subtle); text-align: center; }
+
+/* ─────── 表单字段 ─────── */
+
+.field { display: grid; gap: var(--sp-2); }
+
+.field__label {
+  font-size: var(--text-sm);
+  color: var(--color-fg-muted);
+  letter-spacing: var(--ls-label);
+}
+
+.field__input {
+  min-height: 44px;
+  padding: var(--sp-3) var(--sp-4);
+  border: 1px solid var(--glass-3);
+  border-radius: var(--radius-none);
+  background: var(--color-bg);
+  color: var(--color-fg);
+  font-family: inherit;
+  font-size: var(--text-base);
+}
+
+.field__input--area { min-height: 96px; resize: vertical; line-height: var(--lh-body); }
+
+.field__input:focus-visible {
+  outline: 2px solid var(--brand-400);
+  outline-offset: 2px;
+  border-color: var(--brand-400);
+}
+
+/* ─────── 登录面板 ─────── */
+
+.auth-panel {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal, 1000);
+  display: grid;
+  place-items: center;
+  padding: var(--sp-4);
+  background: rgba(0, 0, 0, 0.78);
+  backdrop-filter: blur(6px);
+}
+.auth-panel[hidden] { display: none; }
+
+.auth-panel__box {
+  position: relative;
+  width: min(100%, 420px);
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: var(--sp-6);
+  border: 1px solid var(--glass-3);
+  background: var(--color-bg-elevated);
+  display: grid;
+  gap: var(--sp-4);
+}
+
+.auth-panel__close {
+  position: absolute;
+  top: var(--sp-3); right: var(--sp-3);
+  width: 32px; height: 32px;
+  border: 1px solid var(--glass-2);
+  background: transparent;
+  color: var(--color-fg-muted);
+  font-size: var(--text-lg);
+  line-height: 1;
+  cursor: pointer;
+}
+.auth-panel__close:hover { color: var(--color-fg); }
+
+.auth-panel__title { font-size: var(--text-xl); }
+
+.auth-panel__hint { font-size: var(--text-sm); color: var(--color-fg-subtle); }
+
+.auth-panel__tabs {
+  display: flex;
+  border-bottom: 1px solid var(--glass-2);
+}
+
+.auth-panel__tab {
+  flex: 1;
+  min-height: 44px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: var(--color-fg-muted);
+  font-family: inherit;
+  font-size: var(--text-sm);
+  cursor: pointer;
+}
+.auth-panel__tab[aria-selected="true"] {
+  color: var(--color-fg);
+  border-bottom-color: var(--brand-400);
+}
+
+.auth-panel__pane { display: grid; gap: var(--sp-4); }
+.auth-panel__pane[hidden] { display: none; }
+
+.auth-panel__pane form { display: grid; gap: var(--sp-4); }
+
+.auth-panel__row { display: flex; gap: var(--sp-2); }
+
+.auth-panel__msg {
+  min-height: 1.25em;
+  font-size: var(--text-sm);
+  color: var(--color-fg-muted);
+}
+.auth-panel__msg[data-err="1"] { color: var(--error); }
+
+/* ─────── 轻量提示条 ─────── */
+
+.cloud-toast {
+  position: fixed;
+  left: 50%;
+  bottom: var(--sp-6);
+  z-index: calc(var(--z-modal, 1000) + 10);
+  transform: translate(-50%, 150%);
+  max-width: min(92vw, 420px);
+  padding: var(--sp-3) var(--sp-5);
+  border: 1px solid var(--glass-3);
+  background: var(--color-bg-elevated);
+  color: var(--color-fg);
+  font-size: var(--text-sm);
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 0.25s ease, opacity 0.25s ease;
+}
+.cloud-toast[data-on="true"] {
+  transform: translate(-50%, 0);
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .like-btn { transition: none; }
+  .like-btn:hover, .like-btn:active { transform: none; }
+  .like-btn[data-liked="true"] .like-btn__heart { animation: none; }
+  .cloud-toast { transition: opacity 0.01ms; transform: translate(-50%, 0); }
 }

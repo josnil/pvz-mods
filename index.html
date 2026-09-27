@@ -18,6 +18,7 @@
 }
 </script>
 
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="icon" type="image/png" sizes="32x32" href="assets/img/favicon-32.png">
 <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
 <link rel="stylesheet" href="assets/css/tokens.css">
@@ -47,12 +48,19 @@
         植物大战僵尸杂交版个人 Mod 存放站 —— 植物、僵尸、地图与工具
       </h1>
 
-      <!-- 巨型排版：视觉主题，语义已由上面的 h1 承担 -->
+      <!-- 巨型排版：视觉主题，语义已由上面的 h1 承担
+           ⚠️ 结构必须是「外层行 + 内层词」两层，不能只写一层：
+              外层 .hero__line 承担**入场**（.reveal-group.is-visible > * 会给它
+                挂 reveal-up），内层 .hero__word 承担**常驻浮动**（hero-float）。
+              若把两个动画挂在同一个元素上，reveal 规则的选择器权重更高
+              （.reveal-group.is-visible > * = 0,2,0 ＞ .hero__line = 0,1,0），
+              animation 简写会被整条覆盖 ⇒ 浮动动画**根本不生效**
+              （实测：getComputedStyle 读到的 animationName 是 reveal-up）。 -->
       <p class="hero__display reveal-group" aria-hidden="true">
-        <span class="hero__line">杂交版</span>
-        <span class="hero__line hero__line--end">个人</span>
-        <span class="hero__line">Mod</span>
-        <span class="hero__line hero__line--end">存放站</span>
+        <span class="hero__line"><span class="hero__word">杂交版</span></span>
+        <span class="hero__line hero__line--end"><span class="hero__word">个人</span></span>
+        <span class="hero__line"><span class="hero__word hero__word--latin" lang="en">Mod</span></span>
+        <span class="hero__line hero__line--end"><span class="hero__word">存放站</span></span>
       </p>
 
       <p class="hero__lede reveal">
@@ -66,19 +74,19 @@
 
       <div class="hero__stats reveal">
         <div class="hero__stat">
-          <span class="hero__stat-num" data-stat="total">8</span>
+          <span class="hero__stat-num" data-stat="total">11</span>
           <span class="hero__stat-label">Mod 总数</span>
         </div>
         <div class="hero__stat">
-          <span class="hero__stat-num" data-stat="plants">2</span>
+          <span class="hero__stat-num" data-stat="plants">3</span>
           <span class="hero__stat-label">植物类</span>
         </div>
         <div class="hero__stat">
-          <span class="hero__stat-num" data-stat="zombies">3</span>
+          <span class="hero__stat-num" data-stat="zombies">4</span>
           <span class="hero__stat-label">僵尸类</span>
         </div>
         <div class="hero__stat">
-          <span class="hero__stat-num" data-stat="others">3</span>
+          <span class="hero__stat-num" data-stat="others">4</span>
           <span class="hero__stat-label">地图与工具</span>
         </div>
       </div>

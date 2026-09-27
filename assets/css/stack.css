@@ -77,6 +77,33 @@
 
 /* ═══════ 卡槽 ═══════ */
 
+/* ★ 牌堆底影：收起态下卡片是叠在一起的，只有边缘能露出来。
+   在卡槽底部垫一条与卡同宽的软影，让"这一叠"有重量感、浮在氛围背景之上，
+   而不是几张纸片贴在黑底上。
+   ⚠️ 必须放在卡槽上、卡之下（--z 更低），且不参与命中。 */
+.stack__cards::before {
+  content: "";
+  position: absolute;
+  inset-inline-start: 50%;
+  inset-block-end: -10px;
+  width: calc(var(--card-w) * 0.92);
+  height: 26px;
+  margin-inline-start: calc(var(--card-w) * -0.46);
+  border-radius: 50%;
+  background: radial-gradient(ellipse closest-side,
+    rgba(0, 0, 0, 0.55), transparent 72%);
+  pointer-events: none;
+  z-index: 0;
+  transition: opacity var(--dur-base) var(--ease-out);
+}
+
+/* 展开时卡铺开成一条，底影反而多余 ⇒ 淡出 */
+.stack:hover .stack__cards::before,
+.stack:focus-within .stack__cards::before,
+.stack[data-open="true"] .stack__cards::before {
+  opacity: 0;
+}
+
 .stack__cards {
   position: relative;
   display: block;                       /* 卡片全部绝对定位叠在同一锚点上 */

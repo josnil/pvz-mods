@@ -6,13 +6,42 @@
      ② 键盘焦点进入  —— CSS :focus-within
      ③ 点击 / 触屏   —— JS 切换 data-open
 
+   牌叠分为两类：
+     · 静态叠（植物 / 僵尸 / 其他）—— 按分类取 mod，内容固定
+     · 动态叠（最近更新 / 全部 mod）—— 内容由「取样函数」在展开时实时计算，
+       「全部 mod」每次展开都重新随机选取（见 refreshDynamicStack）
+
    移动端 <576px 不做扇形，改由 CSS 降级为横向 scroll-snap 卡条。
    ═══════════════════════════════════════════════════════════════ */
 
 import {
-  CATEGORIES, MODS, STACK_LIMIT,
-  byCategory, formatSize,
+  CATEGORIES, STACK_LIMIT,
+  byCategory, formatSize, primaryUrl,
+  recentLevels, randomMods,
 } from './mods.js';
+
+/* ───────────────────────────────────────────────────────────
+   动态叠定义（在静态分类之后追加）
+   ─────────────────────────────────────────────────────────── */
+
+const DYNAMIC_STACKS = [
+  {
+    key: 'recent',
+    name: '最近更新',
+    slug: null,                       // 不跳分类页
+    hint: '悬停展开 · 最近更新 / 上传的关卡',
+    sample: () => recentLevels(3),    // 固定取最近 3 个关卡，不重随机
+    reshuffle: false,
+  },
+  {
+    key: 'all',
+    name: '全部 mod',
+    slug: null,
+    hint: '悬停展开 · 每次展开随机换一批',
+    sample: () => randomMods(3),      // ★ 每次展开重新随机
+    reshuffle: true,
+  },
+];
 
 /* ───────────────────────────────────────────────────────────
    渲染：单个 mod 卡片
@@ -54,11 +83,16 @@ function modCardHTML(mod, depth, index) {
     .join('');
 
   const sizeText = mod.fileSize ? formatSize(mod.fileSize) : '工具';
+  // ★ 卡片点击默认跳夸克网盘（无夸克链接才回退 GitHub / 详情页）
+  const href = primaryUrl(mod);
+  const external = /^https?:/i.test(href);
 
   return `
     <li class="stack__card" style="--i:${index}">
-      <a class="mod-card" href="mod/${mod.id}.html" ${cardAttrs}
-         aria-label="${mod.name} — 查看详情">
+      <a class="mod-card" href="${href}" ${cardAttrs}
+         data-mod-card="${mod.id}"
+         ${external ? 'target="_blank" rel="noopener"' : ''}
+         aria-label="${mod.name} — ${external ? '前往下载' : '查看详情'}">
         <div class="mod-card__media">
           ${media}
         </div>
@@ -72,7 +106,8 @@ function modCardHTML(mod, depth, index) {
           <div class="mod-card__pop-title">${mod.name}</div>
           <p class="mod-card__pop-desc">${mod.description}</p>
           <dl class="mod-card__pop-stats">${popStats}</dl>
-          <div class="mod-card__pop-hint">点击查看详情与下载 →</div>
+          <div class="mod-card__pop-hint">${
+            external ? '点击前往下载 →' : '点击查看详情 →'}</div>
         </div>
       </a>
     </li>`;
@@ -95,11 +130,14 @@ function moreCardHTML(cat, total, index) {
 }
 
 /* ───────────────────────────────────────────────────────────
-   渲染：一整叠
+   渲染：一整叠（静态分类叠 或 动态叠）
    ─────────────────────────────────────────────────────────── */
 
-function stackHTML(cat) {
-  const mods = byCategory(cat.key);
+/**
+ * @param {object} cat      叠描述（key / name / slug / hint / sample / reshuffle）
+ * @param {Array}  mods     该叠要展示的 mod 列表
+ */
+function stackHTML(cat, mods) {
   const shown = mods.slice(0, STACK_LIMIT);
   const hasMore = mods.length > STACK_LIMIT;
 
@@ -107,38 +145,122 @@ function stackHTML(cat) {
   const more = hasMore ? moreCardHTML(cat, mods.length, shown.length) : '';
 
   const total = shown.length + (hasMore ? 1 : 0);
-  // 居中偏移量 c = i - (N-1)/2，写成 CSS 变量供扇形变换使用
-  const withCenter = (html) => html;   // --c 由下面的 assignCenters 统一注入
+
+  const hint = cat.hint
+    || (mods.length > 0 ? '悬停展开 · 点击卡片看详情' : '暂无内容');
 
   return `
     <div class="stack" data-category="${cat.key}" data-count="${mods.length}"
+         data-dynamic="${Boolean(cat.sample)}"
+         data-reshuffle="${Boolean(cat.reshuffle)}"
          data-open="false" data-total-cards="${total}">
       <button class="stack__label" type="button"
               aria-expanded="false" aria-controls="stack-${cat.key}">
         <span class="stack__name">${cat.name}</span>
         <span class="stack__count">${mods.length}</span>
       </button>
-      <p class="stack__hint">${mods.length > 0 ? '悬停展开 · 点击卡片看详情' : '暂无内容'}</p>
+      <p class="stack__hint">${hint}</p>
 
       <ul class="stack__cards" id="stack-${cat.key}">
-        ${withCenter(cards + more)}
+        ${cards + more}
       </ul>
     </div>`;
+}
+
+/* ───────────────────────────────────────────────────────────
+   动态叠：按 sample() 重新取样本并只替换 <li> 列表
+   —— 「全部 mod」在每次展开前调用一次 ⇒ 每次内容都不同
+   ─────────────────────────────────────────────────────────── */
+
+function refreshDynamicStack(root, stack, cat) {
+  if (!cat.sample) return;
+  const ul = stack.querySelector('.stack__cards');
+  if (!ul) return;
+
+  const mods = cat.sample();
+  const shown = mods.slice(0, STACK_LIMIT);
+  const hasMore = mods.length > STACK_LIMIT;
+  const more = hasMore ? moreCardHTML(cat, mods.length, shown.length) : '';
+
+  ul.innerHTML = shown.map((m, i) => modCardHTML(m, 1, i)).join('') + more;
+
+  stack.dataset.count = String(mods.length);
+  stack.querySelector('.stack__count').textContent = String(mods.length);
+  stack.dataset.totalCards = String(shown.length + (hasMore ? 1 : 0));
+
+  assignCentersIn(stack);
+  bindCardInteractions(root, stack);
 }
 
 /* ───────────────────────────────────────────────────────────
    注入居中偏移 --c，并保留 --i
    ─────────────────────────────────────────────────────────── */
 
+function assignCentersIn(stack) {
+  const cards = [...stack.querySelectorAll('.stack__card')];
+  const n = cards.length;
+  cards.forEach((card, i) => {
+    const c = n > 1 ? i - (n - 1) / 2 : 0;
+    card.style.setProperty('--c', c.toFixed(3));
+    card.style.setProperty('--i', i);
+  });
+}
+
 function assignCenters(root) {
-  root.querySelectorAll('.stack').forEach((stack) => {
-    const cards = [...stack.querySelectorAll('.stack__card')];
-    const n = cards.length;
-    cards.forEach((card, i) => {
-      const c = n > 1 ? i - (n - 1) / 2 : 0;
-      card.style.setProperty('--c', c.toFixed(3));
-      card.style.setProperty('--i', i);
-    });
+  root.querySelectorAll('.stack').forEach((stack) => assignCentersIn(stack));
+}
+
+/* ───────────────────────────────────────────────────────────
+   卡片自身的交互（浮窗边界修正 / 触屏首次点击只展开信息）
+   —— 动态叠换了一批卡片后必须重新绑，故抽成函数
+   ─────────────────────────────────────────────────────────── */
+
+function bindCardInteractions(root, scope) {
+  const cards = scope.querySelectorAll('.mod-card');
+  const isTouch = matchMedia('(hover: none), (pointer: coarse)').matches;
+
+  cards.forEach((card) => {
+    // 浮窗左右边界修正
+    const fix = () => {
+      const pop = card.querySelector('.mod-card__pop');
+      if (!pop) return;
+      pop.removeAttribute('data-align');
+      const rect = card.getBoundingClientRect();
+      const popW = Math.min(pop.offsetWidth || 272, 272);
+      const half = popW / 2;
+      const cx = rect.left + rect.width / 2;
+      if (cx - half < 8) pop.dataset.align = 'start';
+      else if (cx + half > innerWidth - 8) pop.dataset.align = 'end';
+    };
+    card.addEventListener('pointerenter', fix, { passive: true });
+    card.addEventListener('focusin', fix);
+
+    // 动态封面：视频懒加载（首次 hover / focus 才 load()）
+    if (card.dataset.hasVideo === 'true') {
+      const video = card.querySelector('.mod-card__video');
+      const activate = () => {
+        if (video && video.dataset.loaded !== '1') {
+          video.load();
+          video.dataset.loaded = '1';
+        }
+        video?.play().catch(() => {});
+      };
+      card.addEventListener('pointerenter', activate, { once: true });
+      card.addEventListener('focusin', activate, { once: true });
+    }
+
+    // 触屏：第一次点击只展开浮窗信息，不直接跳转（避免误触外链）
+    if (isTouch && !card.classList.contains('mod-card--more')) {
+      card.addEventListener('click', (e) => {
+        if (card.dataset.pop !== 'true') {
+          e.preventDefault();
+          root.querySelectorAll('.mod-card').forEach((c) => (c.dataset.pop = 'false'));
+          card.dataset.pop = 'true';
+        } else {
+          card.dataset.pop = 'false';
+        }
+      });
+    }
   });
 }
 
@@ -146,11 +268,12 @@ function assignCenters(root) {
    交互：点击切换（触屏与无 hover 设备的主通道）
    ─────────────────────────────────────────────────────────── */
 
-function initToggles(root) {
+function initToggles(root, dynByKey) {
   const isTouch = matchMedia('(hover: none), (pointer: coarse)').matches;
 
   root.querySelectorAll('.stack').forEach((stack) => {
     const label = stack.querySelector('.stack__label');
+    const cat = dynByKey.get(stack.dataset.category);
 
     label?.addEventListener('click', () => {
       const open = stack.dataset.open === 'true';
@@ -160,10 +283,19 @@ function initToggles(root) {
         s.querySelector('.stack__label')?.setAttribute('aria-expanded', 'false');
       });
       if (!open) {
+        // ★ 展开前刷新动态叠：「全部 mod」这里重新随机
+        if (cat && cat.reshuffle) refreshDynamicStack(root, stack, cat);
         stack.dataset.open = 'true';
         label.setAttribute('aria-expanded', 'true');
       }
     });
+
+    // 桌面端也支持 hover 展开 —— 展开瞬间重新随机（与点击同语义）
+    if (!isTouch && cat && cat.reshuffle) {
+      stack.addEventListener('pointerenter', () => {
+        refreshDynamicStack(root, stack, cat);
+      }, { passive: true });
+    }
 
     // 触屏：点空白处收起
     if (isTouch) {
@@ -192,71 +324,6 @@ function initToggles(root) {
       }
     });
   });
-
-  // 触屏：卡片第一次点击只负责展开浮窗信息，不直接跳转
-  if (isTouch) {
-    root.querySelectorAll('.mod-card:not(.mod-card--more)').forEach((card) => {
-      card.addEventListener('click', (e) => {
-        if (card.dataset.pop !== 'true') {
-          e.preventDefault();
-          root.querySelectorAll('.mod-card').forEach((c) => (c.dataset.pop = 'false'));
-          card.dataset.pop = 'true';
-        } else {
-          card.dataset.pop = 'false';
-        }
-      });
-    });
-  }
-}
-
-/* ───────────────────────────────────────────────────────────
-   动态封面：视频懒加载 —— 首次 hover / focus 才 load()
-   避免首屏加载 8 个视频
-   ─────────────────────────────────────────────────────────── */
-
-function initLazyVideo(root) {
-  root.querySelectorAll('.mod-card[data-has-video="true"]').forEach((card) => {
-    const video = card.querySelector('.mod-card__video');
-    if (!video) return;
-
-    const activate = () => {
-      if (video.dataset.loaded !== '1') {
-        video.load();
-        video.dataset.loaded = '1';
-      }
-      // 自动播放可能被浏览器拦截 —— 静默降级，留在静态图
-      video.play().catch(() => {});
-    };
-
-    card.addEventListener('pointerenter', activate, { once: true });
-    card.addEventListener('focusin', activate, { once: true });
-  });
-}
-
-/* ───────────────────────────────────────────────────────────
-   浮窗边界修正：靠近视口左右边缘时换对齐方式
-   ─────────────────────────────────────────────────────────── */
-
-function initPopoverAlign(root) {
-  const fix = (card) => {
-    const pop = card.querySelector('.mod-card__pop');
-    if (!pop) return;
-    pop.removeAttribute('data-align');
-
-    // 先复位再测量
-    const rect = card.getBoundingClientRect();
-    const popW = Math.min(pop.offsetWidth || 272, 272);
-    const half = popW / 2;
-    const cx = rect.left + rect.width / 2;
-
-    if (cx - half < 8) pop.dataset.align = 'start';
-    else if (cx + half > innerWidth - 8) pop.dataset.align = 'end';
-  };
-
-  root.querySelectorAll('.mod-card').forEach((card) => {
-    card.addEventListener('pointerenter', () => fix(card), { passive: true });
-    card.addEventListener('focusin', () => fix(card));
-  });
 }
 
 /* ───────────────────────────────────────────────────────────
@@ -267,13 +334,19 @@ export function initStacks() {
   const host = document.querySelector('[data-stacks]');
   if (!host) return;
 
+  // 静态分类叠 + 动态叠
+  const staticStacks = CATEGORIES.map((cat) => ({ cat, mods: byCategory(cat.key) }));
+  const dynamicStacks = DYNAMIC_STACKS.map((cat) => ({ cat, mods: cat.sample() }));
+
+  const dynByKey = new Map(DYNAMIC_STACKS.map((c) => [c.key, c]));
+
   host.innerHTML = `
     <div class="stacks__row">
-      ${CATEGORIES.map(stackHTML).join('')}
+      ${staticStacks.map(({ cat, mods }) => stackHTML(cat, mods)).join('')}
+      ${dynamicStacks.map(({ cat, mods }) => stackHTML(cat, mods)).join('')}
     </div>`;
 
   assignCenters(host);
-  initToggles(host);
-  initLazyVideo(host);
-  initPopoverAlign(host);
+  initToggles(host, dynByKey);
+  host.querySelectorAll('.stack').forEach((s) => bindCardInteractions(host, s));
 }

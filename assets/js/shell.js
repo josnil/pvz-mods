@@ -147,10 +147,35 @@ export function crumbsHTML(depth, items) {
 }
 
 /* ───────────────────────────────────────────────────────────
+   氛围背景层（导航 / 内容 / 页脚 之前）
+   ▸ 单一真源：11 个页面都靠这一处注入，避免复制粘贴
+   ▸ 两层职责分离：
+       .bg__base   —— 深海军蓝径向渐变（静态，还原参考站的底）
+       canvas      —— 星云光点（nebula.js 自己 insertBefore 到 .bg__veil 前）
+       .bg__veil   —— 底部压暗，保证页脚小字对比度
+   ─────────────────────────────────────────────────────────── */
+
+export function bgHTML() {
+  return `
+    <div class="bg" aria-hidden="true">
+      <div class="bg__base"></div>
+      <div class="bg__veil"></div>
+    </div>`;
+}
+
+/* ───────────────────────────────────────────────────────────
    注入外壳 + 初始化交互
    ─────────────────────────────────────────────────────────── */
 
 export function mountShell({ depth = 0, current = '', crumbs = null } = {}) {
+  // ★ 背景必须第一个插进 body，保证它早于所有内容存在
+  //   （虽然 CSS 用了负 z-index 兜底，但 DOM 顺序在前能少一层"万一"）
+  if (!document.querySelector('.bg')) {
+    const host = document.createElement('div');
+    host.innerHTML = bgHTML().trim();
+    document.body.insertBefore(host.firstElementChild, document.body.firstChild);
+  }
+
   const navHost = document.querySelector('[data-shell-nav]');
   if (navHost) navHost.outerHTML = navHTML(depth, current);
 

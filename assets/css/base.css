@@ -13,7 +13,8 @@ html {
 
 body {
   margin: 0;
-  background: var(--color-bg);
+  /* ★ 兜底纯色（无 JS / 极冷启动时的第一帧），真正的氛围由 .bg 层叠加 */
+  background: var(--bg-base-0);
   color: var(--color-fg);
   font-family: var(--font-body);
   font-size: var(--text-base);
@@ -21,6 +22,70 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: clip;
+  position: relative;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   氛围背景（两层 + 画布，全部 pointer-events:none，永不挡交互）
+     ① .bg__base     —— 深海军蓝径向渐变（还原参考站的底）
+     ② canvas.nebula —— 星云光点（JS canvas，见 nebula.js）
+     ③ .bg__veil     —— 底部收口，保证页脚小字对比度
+   层级：bg(-1) < 内容 < 导航(9) < 光标(10)
+   ⚠️ 全部 position:fixed，避免随页面滚动重绘；用负 z-index 压在内容之下。
+
+   ▸ 底为什么是「顶部中央亮、四周暗」的径向渐变：
+     参考站 rstyro.github.io/html5/nebula.html 的 html 背景就是
+     `radial-gradient(ellipse farthest-corner at center top,
+      #000d4d 0%, #000105 100%)`。实拍取色确认是**深海军蓝**
+     （#000d4d），不是紫、更不是纯黑 —— 这是该效果观感的一半。
+   ▸ 原先的 CSS 极光光斑已移除：星云画布本身就是"会发光的一团"，
+     两层都动会互相打架，也让移动端多背一份合成开销。
+   ═══════════════════════════════════════════════════════════════ */
+
+.bg {
+  position: fixed;
+  inset: 0;
+  /* ★ 负层级：无论 .bg 被插到 DOM 的哪个位置，都一定在内容之下。
+     用 0 会有"同为 0 时按 DOM 顺序压过正文"的坑（见 tokens.css 注释）。 */
+  z-index: var(--z-bg);
+  pointer-events: none;
+  overflow: clip;
+  /* 自身作为一个合成层，隔离内部动画，避免引起整页重排 */
+  contain: strict;
+}
+
+.bg__base {
+  position: absolute;
+  inset: 0;
+  /* ★ 还原参考站：椭圆径向渐变，锚在顶部中央 */
+  background: radial-gradient(
+    ellipse farthest-corner at 50% 0%,
+    var(--bg-nebula-core) 0%,
+    var(--bg-nebula-mid) 42%,
+    var(--bg-nebula-edge) 100%
+  );
+}
+
+/* 星云画布（nebula.js 把 <canvas> 插到 .bg__veil 之前） */
+.nebula {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* 底部压暗：星云光点在页脚附近会抬高背景亮度，
+   叠一层自上而下的收口，保证页脚小字始终够对比度 */
+.bg__veil {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    transparent 0 68%,
+    rgba(0, 1, 5, 0.42) 88%,
+    rgba(0, 1, 5, 0.78) 100%
+  );
 }
 
 h1, h2, h3, h4, h5, h6, p, figure, blockquote { margin: 0; }
@@ -229,4 +294,8 @@ table { border-collapse: collapse; }
   }
 
   .skip-link { transition: none; }
+
+  /* ★ 星云并没有在这里关掉 —— 它由 nebula.js 读同一个 media query，
+     降级为"一帧静态星云"（不跑 rAF、不漂移、无视差）。
+     见 assets/js/nebula.js 的 prefersReduced() 分支。 */
 }

@@ -8,6 +8,8 @@
    ▸ 新增一个 mod：往 MODS 数组里加一条即可，首页/分类页/详情页会自动出现
    ▸ cover.animated 为 null ⇒ 自动降级为静态图 + CSS 光扫微动效
    ▸ cover.frames > 1     ⇒ 用序列图做逐帧动画（steps）
+   ▸ quark / quarkAll     ⇒ 夸克网盘分享链接；卡片点击默认跳 quark（回退 download）
+   ▸ updatedAt            ⇒ ISO 日期，用于「最近更新」牌叠排序（新 → 旧）
    ═══════════════════════════════════════════════════════════════ */
 
 /** 分类元信息（顺序即首页牌叠顺序） */
@@ -37,6 +39,22 @@ export const CATEGORIES = [
 
 /** 下载基址（GitHub Release 建好后替换这里即可全局生效） */
 const DL_BASE = 'https://github.com/josnil/pvz-mods/releases/latest/download';
+
+/** 夸克网盘 —— 全部 mod 的总分享链接（文件夹级，一次拿全） */
+export const QUARK_ALL = 'https://pan.quark.cn/s/eca3724f6450';
+
+/** 每个 mod 一份独立夸克链接（键 = mod id） */
+const QUARK = {
+  supergatlingpea: 'https://pan.quark.cn/s/3e3b62402dfd',
+  ultimatecherrygod: 'https://pan.quark.cn/s/f8cacc624df8',
+  supergatlingpaper: 'https://pan.quark.cn/s/aae6cedcf4dc',
+  sunflowerqueenzombie: 'https://pan.quark.cn/s/05b35a3625e2',
+  discogargantuarpult: 'https://pan.quark.cn/s/1bd55f3d58f6',
+  vampirepool: 'https://pan.quark.cn/s/7ecbb59a05cc',
+  peaoverhaul: 'https://pan.quark.cn/s/05e3ee9fe1e3',
+  nailongzombie: 'https://pan.quark.cn/s/f7aeb4a298fe',
+  pandorapool: 'https://pan.quark.cn/s/b9c9a19766c6',
+};
 
 export const MODS = [
   /* ═══════════════ 植物类 ═══════════════ */
@@ -73,6 +91,8 @@ export const MODS = [
       alt: '超级机枪射手 — 戴头盔与护目镜的绿色豌豆射手，装配多管机枪炮口',
     },
     download: `${DL_BASE}/supergatlingpea.pmod`,
+    quark: QUARK.supergatlingpea,
+    updatedAt: '2026-09-26',
   },
   {
     id: 'ultimatecherrygod',
@@ -111,6 +131,8 @@ export const MODS = [
       alt: '究极樱桃战神 — 红色樱桃龙首状植物，金色巨口露出尖牙，周围环绕绿叶',
     },
     download: `${DL_BASE}/ultimatecherrygod.pmod`,
+    quark: QUARK.ultimatecherrygod,
+    updatedAt: '2026-09-26',
   },
 
   /* ═══════════════ 僵尸类 ═══════════════ */
@@ -148,6 +170,8 @@ export const MODS = [
       alt: '超级机枪读报僵尸 — 戴头盔护目镜的读报僵尸，手持报纸并装配机枪炮口',
     },
     download: `${DL_BASE}/supergatlingpaper.pmod`,
+    quark: QUARK.supergatlingpaper,
+    updatedAt: '2026-09-24',
   },
   {
     id: 'sunflowerqueenzombie',
@@ -186,6 +210,8 @@ export const MODS = [
       alt: '向日葵女王僵尸 — 戴金色王冠的向日葵头，配火焰迪斯科身体，脚踩火焰光环',
     },
     download: `${DL_BASE}/sunflowerqueenzombie.pmod`,
+    quark: QUARK.sunflowerqueenzombie,
+    updatedAt: '2026-09-25',
   },
   {
     id: 'discogargantuarpult',
@@ -220,6 +246,8 @@ export const MODS = [
       alt: '暴走舞王伽刚特尔投石车僵尸 — 投石车僵尸造型，车斗内载着暴走舞王伽刚特尔',
     },
     download: `${DL_BASE}/discogargantuarpult.pmod`,
+    quark: QUARK.discogargantuarpult,
+    updatedAt: '2026-09-22',
   },
 
   /* ═══════════════ 其他：地图 ═══════════════ */
@@ -257,6 +285,8 @@ export const MODS = [
       alt: '吸血鬼屋泳池 — 血红色泳池横贯中央，配血红满月与哥特式吸血鬼屋夜景',
     },
     download: `${DL_BASE}/vampirepool.pmod`,
+    quark: QUARK.vampirepool,
+    updatedAt: '2026-09-19',
   },
 
   /* ═══════════════ 其他：工具 ═══════════════ */
@@ -290,6 +320,8 @@ export const MODS = [
       alt: '全模式关卡构建器 — 关卡可视化编辑器界面',
     },
     download: '',
+    quark: '',
+    updatedAt: '2026-09-13',
   },
   {
     id: 'mod-editor',
@@ -321,6 +353,130 @@ export const MODS = [
       alt: 'Mod 图形编辑器 — 深色界面的 Mod 属性编辑与打包工具截图',
     },
     download: '',
+    quark: '',
+    updatedAt: '2026-09-17',
+  },
+
+  /* ═══════════════ 植物类（新增） ═══════════════ */
+  {
+    id: 'peaoverhaul',
+    name: '豌豆强化',
+    category: 'plant',
+    cardType: 'NORMAL',
+    author: '云漫行',
+    version: '1.0.0',
+    fileSize: 3212,
+    pkgName: 'PeaOverhaul.pmod',
+    cardClass: '覆盖型',
+    description:
+      '放大豌豆类子弹并提升伤害与穿透：一次覆盖 PeaDefault / SnowPea / FirePea / GoldPea 四种子弹，子弹 scale 提到 1.6 倍、穿透 8 个。演示型 Mod，适合作为「覆盖内置资源」的模板。',
+    tags: ['覆盖', '子弹', '穿透', '模板'],
+    stats: [
+      { label: '覆盖子弹', value: '4 种' },
+      { label: '弹药 scale', value: '1.6×' },
+      { label: '穿透数', value: '8' },
+      { label: '火焰弹伤害', value: '120' },
+      { label: '是否含插件', value: '否' },
+      { label: '体积', value: '3.1 KB' },
+    ],
+    mechanics: [
+      'overrides.Projectile = [PeaDefault, SnowPea, FirePea, GoldPea]',
+      '全部走「覆盖内置资源」，不新增任何角色或卡片',
+      '子弹尺寸 scale = (1.6, 1.6)，穿透 penetrateNum = 8',
+      'FirePea 伤害 120、damageFlags = 7、爆破粒子走 FireSplats',
+      '无托管运行时插件（runtimeAssembly 为空）',
+    ],
+    cover: {
+      static: 'assets/img/covers/peaoverhaul.png',
+      animated: null,
+      frames: 0,
+      alt: '豌豆强化 — 四颗被放大的豌豆子弹（普通绿豌豆 / 寒冰蓝豌豆 / 火焰豌豆 / 金色豌豆）',
+    },
+    download: `${DL_BASE}/peaoverhaul.pmod`,
+    quark: QUARK.peaoverhaul,
+    updatedAt: '2026-09-15',
+  },
+
+  /* ═══════════════ 僵尸类（新增） ═══════════════ */
+  {
+    id: 'nailongzombie',
+    name: '奶龙僵尸',
+    category: 'zombie',
+    cardType: 'NORMAL',
+    author: '云漫行',
+    version: '1.0.0',
+    fileSize: 828651,
+    pkgName: '奶龙僵尸.pmod',
+    cardClass: '普通卡',
+    description:
+      '普通僵尸的移动 / 啃食 / 受击 / 死亡，外加大笑控场：出场后每 10 秒大笑一次，切到大笑形象并播奶龙笑声，一边笑一边照常往前冲；全场植物被笑得僵直 3 秒、完全无法发射子弹。',
+    tags: ['控场', '大笑', '僵直', '音效', '托管插件'],
+    stats: [
+      { label: '大笑间隔', value: '10s' },
+      { label: '僵直时长', value: '3s' },
+      { label: '僵直效果', value: '禁止发射' },
+      { label: '形态', value: '2 套形象' },
+      { label: '音效', value: '奶龙笑声' },
+      { label: '体积', value: '809 KB' },
+    ],
+    mechanics: [
+      '大笑时切换到「捧腹大笑」形象，播 nailong_laugh.wav',
+      '大笑期间照常前进，不打断移动',
+      '全场植物僵直 3 秒，发射被完全封锁（含射手类）',
+      'provide：Audio / Character / CharacterSprite / Packet 各 1 项',
+      '托管运行时：Runtime/ModAssembly.dll（入口 NaiLongRuntimeEntry）',
+    ],
+    cover: {
+      static: 'assets/img/covers/nailongzombie.png',
+      animated: null,
+      frames: 0,
+      alt: '奶龙僵尸 — 黄色圆润的奶龙捧腹大笑形象，闭眼张嘴、双手捂着肚子',
+    },
+    download: `${DL_BASE}/nailongzombie.pmod`,
+    quark: QUARK.nailongzombie,
+    updatedAt: '2026-09-25',
+  },
+
+  /* ═══════════════ 其他：地图（新增） ═══════════════ */
+  {
+    id: 'pandorapool',
+    name: '潘多拉泳池',
+    category: 'other',
+    cardType: 'MAP',
+    author: '云漫行',
+    version: '1.1.0',
+    fileSize: 14287,
+    pkgName: '潘多拉泳池.pmod',
+    cardClass: '地图',
+    description:
+      '泳池自选卡关卡：初始阳光 1500，开局即出戴夫博士（0.45 倍血 144000），普通/路障/铁桶僵尸源源不断（15 波），击败博士并清空全场才算胜利。命运选项框每 25 秒弹出，选「衰老」则 45 秒内无法使用铲子。',
+    tags: ['关卡', '泳池', 'BOSS', '命运选项', '托管插件'],
+    stats: [
+      { label: '初始阳光', value: '1500' },
+      { label: 'BOSS 血量', value: '144000' },
+      { label: 'BOSS 倍率', value: '0.45×' },
+      { label: '波数', value: '15' },
+      { label: '选项框间隔', value: '25s' },
+      { label: '胜利条件', value: '击败博士 + 清场' },
+    ],
+    mechanics: [
+      '地图 = Backyard（泳池），种子库为「自选卡」（SeedBank.METHOD = CHOOSE）',
+      '开局即生成戴夫博士，血量按内置值 × 0.45 = 144000',
+      '15 波僵尸：普通 / 路障 / 铁桶',
+      '命运选项框每 25 秒弹出，标题「选择你的命运吧！」',
+      '选中「衰老」⇒ 45 秒内无法使用铲子；不选择则流程不受影响',
+      'provide：Level = PandoraCatalog',
+      '托管运行时：Runtime/ModAssembly.dll（入口 PandoraLevelRuntimeEntry）',
+    ],
+    cover: {
+      static: 'assets/img/covers/pandorapool.jpg',
+      animated: null,
+      frames: 0,
+      alt: '潘多拉泳池 — 官方后院泳池关卡俯视图，蓝色泳池配木栈道、遮阳伞与烤炉',
+    },
+    download: `${DL_BASE}/pandorapool.pmod`,
+    quark: QUARK.pandorapool,
+    updatedAt: '2026-09-27',
   },
 ];
 
@@ -334,6 +490,54 @@ export const byCategory = (key) => MODS.filter((m) => m.category === key);
 export const getMod = (id) => MODS.find((m) => m.id === id);
 
 export const getCategory = (key) => CATEGORIES.find((c) => c.key === key);
+
+/** 卡片点击的默认去向：优先夸克网盘，回退 GitHub Release，最后回详情页 */
+export function primaryUrl(mod) {
+  return mod.quark || mod.download || `mod/${mod.id}.html`;
+}
+
+/**
+ * 「关卡」范畴 —— 供「最近更新」牌叠使用。
+ * 含：
+ *   · 地图 mod（cardType === 'MAP'）—— 真正的关卡
+ *   · 关卡构建器（id === 'gemmatch-builder'）—— 产出关卡的工具
+ * 说明：站点当前只有 2 个纯地图关卡，若严格只取 MAP 则不足 3 张；
+ *       把「关卡构建器」一并纳入，才能凑满用户要求的 3 个。
+ */
+const LEVEL_IDS = new Set(['gemmatch-builder']);
+
+export const isLevel = (m) => m.cardType === 'MAP' || LEVEL_IDS.has(m.id);
+
+/**
+ * 最近更新 / 上传的关卡（默认 3 个）。
+ * 以 updatedAt（缺失的排在最后）为主序，同日期按数组顺序稳定排列。
+ */
+export function recentLevels(n = 3) {
+  return MODS
+    .filter(isLevel)
+    .slice()
+    .sort((a, b) => {
+      const da = a.updatedAt || '';
+      const db = b.updatedAt || '';
+      if (da === db) return 0;
+      return da < db ? 1 : -1;            // 新 → 旧
+    })
+    .slice(0, n);
+}
+
+/**
+ * 随机取 n 个 mod（Fisher–Yates 部分洗牌）。
+ * ⚠️ 每次调用都重新抽样 —— 调用方在「展开」时重新调用即得新样本。
+ */
+export function randomMods(n = 3) {
+  const pool = MODS.slice();
+  const k = Math.min(n, pool.length);
+  for (let i = 0; i < k; i += 1) {
+    const j = i + Math.floor(Math.random() * (pool.length - i));
+    [pool[i], pool[j]] = [pool[j], pool[i]];
+  }
+  return pool.slice(0, k);
+}
 
 /** 人类可读的文件大小 */
 export function formatSize(bytes) {

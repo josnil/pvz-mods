@@ -7,11 +7,17 @@
 # Playwright 验收截图（2.4 MB，仅本地留档）
 _shots/
 
+# 校验临时产物（夸克链接快照、一次性核对脚本）
+.cache/
+
 # 一次性推送工具（路径写死本机，不属于站点）
 _api_push.py
 _api_push.log
 _shot_final.js
 _shot_stacks.js
+
+# 应用标记（WorkBuddy 本地交付用，不属于站点内容）
+.wbapp_*.genie
 
 # Python 缓存
 __pycache__/

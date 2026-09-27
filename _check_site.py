@@ -181,27 +181,28 @@ def check_wiring():
 
 MOD_IDS = ['supergatlingpea', 'ultimatecherrygod', 'supergatlingpaper',
            'sunflowerqueenzombie', 'discogargantuarpult',
-           'vampirepool', 'gemmatch-builder', 'mod-editor']
+           'vampirepool', 'gemmatch-builder', 'mod-editor',
+           'peaoverhaul', 'nailongzombie', 'pandorapool']
 
 
 def check_data():
     js = read(os.path.join(ROOT, 'assets', 'js', 'mods.js'))
     idx = read(os.path.join(ROOT, 'index.html'))
 
-    # 1) mods.js 里 8 条 id 齐备
-    for mid in MOD_IDS:
-        if ("id: '%s'" % mid) not in js:
-            bad('D mods.js 缺少 %s' % mid)
+    # 1) mods.js 里 11 条 id 齐备
+    miss = [mid for mid in MOD_IDS if ("id: '%s'" % mid) not in js]
+    if miss:
+        bad('D mods.js 缺少 %s' % ', '.join(miss))
     else:
-        ok('D mods.js 含全部 8 条 mod 数据')
+        ok('D mods.js 含全部 %d 条 mod 数据' % len(MOD_IDS))
 
     # 2) 每个 mod 的详情页存在
-    for mid in MOD_IDS:
-        p = os.path.join(ROOT, 'mod', '%s.html' % mid)
-        if not os.path.exists(p):
-            bad('D 详情页缺失 mod/%s.html' % mid)
+    miss = [mid for mid in MOD_IDS
+            if not os.path.exists(os.path.join(ROOT, 'mod', '%s.html' % mid))]
+    if miss:
+        bad('D 详情页缺失 %s' % ', '.join('mod/%s.html' % m for m in miss))
     else:
-        ok('D 8 个 mod 详情页齐备')
+        ok('D %d 个 mod 详情页齐备' % len(MOD_IDS))
 
     # 3) 每个分类页要包含该分类下所有 mod 的详情链接
     #    ⚠️ 不用 json.loads 硬转 JS 字面量（键名不带引号必然炸）——
@@ -236,11 +237,167 @@ def check_data():
         ok('D %s.html 覆盖 %d 个 mod 的详情链接' % (cat['slug'], len(cat_ids)))
 
     # 4) 首页统计数字与实际一致
-    for key, n in (('total', 8), ('plants', 2), ('zombies', 3), ('others', 3)):
-        if 'data-stat="%s">%d<' % (key, n) not in idx:
-            bad('D 首页统计 %s 应为 %d' % (key, n))
+    #    ★ 数字不手写：从 mods.js 的 MODS 块里数，避免"改了数据忘了改断言"
+    #    ⚠️ 字段名是 category（值 = 'plant'/'zombie'/'other'），
+    #       data-stat 的键是复数 slug（plants/zombies/others）—— 两套命名要显式映射。
+    cat_blk = re.search(r'export const MODS = \[(.*?)\n\];', js, re.S)
+    counts = {}
+    if cat_blk:
+        for m in re.finditer(r"category:\s*'([^']+)'", cat_blk.group(1)):
+            counts[m.group(1)] = counts.get(m.group(1), 0) + 1
+    total = len(MOD_IDS)
+    expect = [('total', total)]
+    for key, slug in (('plant', 'plants'), ('zombie', 'zombies'),
+                      ('other', 'others')):
+        expect.append((slug, counts.get(key, 0)))
+    drift = [k for k, n in expect if 'data-stat="%s">%d<' % (k, n) not in idx]
+    if drift:
+        bad('D 首页统计与 mods.js 实际不符：%s（实际 %s）'
+            % (drift, dict(expect)))
     else:
-        ok('D 首页统计数字与实际 mod 数一致（8 / 2 / 3 / 3）')
+        ok('D 首页统计数字与 mods.js 实际 mod 数一致（%s）'
+           % ' / '.join('%s=%d' % kv for kv in expect))
+
+    # 5) ★ 夸克链接：mods.js 的 QUARK / QUARK_ALL 与详情页/分类页字面量双向对齐
+    check_quark(js)
+
+
+# ══════════════════════════════════════════════════════════════
+# D2. 夸克网盘双下载源
+#
+#   口径（用户明确要求）：
+#     · 每个 mod 一个独立夸克链接；全部 mod 再给一个总链接
+#     · 卡片点击默认跳夸克；详情页同时给「夸克」+「GitHub」两个按钮
+#   ⚠️ 这里刻意做**双向**比对：mods.js ↔ 详情页 HTML 字面量。
+#      单向（只查"页面里有夸克字样"）会漏掉"链接串错行"这类真实缺陷
+#      （早前 pandorapool 详情页就是因为 dl_html 被覆盖，
+#        渲染出的按钮里压根没有夸克 —— 只查 # 号不足以发现）。
+# ══════════════════════════════════════════════════════════════
+
+def parse_quark_map(js):
+    """从 mods.js 抽 QUARK_ALL 与 QUARK{id:url}（唯一真源）
+
+    ⚠️ 块边界用 `\\n};`（对象以 `};` 收尾）；只写 `\\n}` 会匹配不到，
+       症状是"QUARK 覆盖 0 个 mod"这种假红。
+    """
+    allm = re.search(r"QUARK_ALL\s*=\s*'([^']+)'", js)
+    block = re.search(r'const QUARK = \{(.*?)\n\};', js, re.S)
+    per = {}
+    if block:
+        for m in re.finditer(
+                r"([A-Za-z0-9_-]+)\s*:\s*'(https://pan\.quark\.cn/s/[0-9a-f]+)'",
+                block.group(1)):
+            per[m.group(1)] = m.group(2)
+    return (allm.group(1) if allm else ''), per
+
+
+def pkg_mods(js):
+    """有 .pmod 包的 mod（工具类 pkgName 为空 ⇒ 不给夸克链/download）"""
+    blk = re.search(r'export const MODS = \[(.*?)\n\];', js, re.S)
+    if not blk:
+        return []
+    out = []
+    for m in re.finditer(r"id:\s*'([^']+)'([\s\S]*?)(?=\n  \{|\n\];)",
+                         blk.group(1)):
+        mid, body = m.group(1), m.group(2)
+        pm = re.search(r"pkgName:\s*'([^']*)'", body)
+        if pm and pm.group(1).strip():
+            out.append(mid)
+    return out
+
+
+def check_quark(js=None):
+    js = js or read(os.path.join(ROOT, 'assets', 'js', 'mods.js'))
+    quark_all, per = parse_quark_map(js)
+    with_pkg = pkg_mods(js)
+
+    if not quark_all:
+        bad('D2 mods.js 缺少 QUARK_ALL 总链接')
+    elif not re.match(r'^https://pan\.quark\.cn/s/[0-9a-f]+$', quark_all):
+        bad('D2 QUARK_ALL 不是合法夸克分享链接：%s' % quark_all)
+    else:
+        ok('D2 QUARK_ALL 存在且格式合法（全部 mod 总链接）')
+
+    # ★ 覆盖率以"有 .pmod 包的 mod"为分母 —— 工具类（构建器/编辑器）
+    #   本身没有可分享的包文件，不该强行给夸克链（会造出死链）。
+    miss = [mid for mid in with_pkg if mid not in per]
+    if miss:
+        bad('D2 以下有 .pmod 的 mod 缺夸克链接：%s' % ', '.join(miss))
+    else:
+        ok('D2 %d 个有 .pmod 的 mod 各有独立夸克链接（工具类除外，无包可分享）'
+           % len(with_pkg))
+
+    dup = [u for u in set(per.values()) if list(per.values()).count(u) > 1]
+    if dup:
+        bad('D2 存在重复的夸克链接（不同 mod 不该共用）：%s' % dup)
+    else:
+        ok('D2 各 mod 夸克链接互不重复（一 mod 一链）')
+
+    # ── 逐详情页：主下载块必须同时含「本 mod 的夸克链」+「GitHub 下载」 ──
+    #    工具类（无 .pmod）没有下载块，跳过 —— 它们只有仓库/总盘入口。
+    checked = 0
+    for mid in with_pkg:
+        p = os.path.join(ROOT, 'mod', '%s.html' % mid)
+        if not os.path.exists(p):
+            continue
+        html = read(p)
+        blk = re.search(r'data-download-block.*?</div>\s*</div>', html, re.S)
+        blk = blk.group(0) if blk else html
+        checked += 1
+        if quark_all not in blk:
+            bad('D2 %s 详情页下载块缺「全部 Mod」总链接' % mid)
+        if mid in per:
+            if per[mid] not in blk:
+                bad('D2 %s 详情页下载块未含自身夸克链 %s' % (mid, per[mid]))
+            if '夸克网盘下载' not in blk:
+                bad('D2 %s 详情页缺夸克下载按钮' % mid)
+            if 'github.com/josnil/pvz-mods/releases' not in blk:
+                bad('D2 %s 详情页缺 GitHub 下载按钮（双源要求）' % mid)
+    ok('D2 %d 个详情页下载块含「本 mod 夸克链 + GitHub 双源 + 总链接」'
+       % checked)
+
+    # ── 分类页卡片：主按钮必须是夸克外链（点击默认跳夸克） ──
+    slug_of = {}
+    cb = re.search(r'export const CATEGORIES = \[(.*?)\n\];', js, re.S)
+    if cb:
+        for m in re.finditer(r"key:\s*'([^']+)'[\s\S]*?slug:\s*'([^']+)'",
+                             cb.group(1)):
+            slug_of[m.group(1)] = m.group(2)
+    for key, slug in slug_of.items():
+        cp = os.path.join(ROOT, '%s.html' % slug)
+        if not os.path.exists(cp):
+            continue
+        chtml = read(cp)
+        for m in re.finditer(r'data-mod-card="([^"]+)"', chtml):
+            cid = m.group(1)
+            seg = chtml[m.start():m.start() + 6000]
+            if cid in per and per[cid] not in seg:
+                bad('D2 %s.html 的 %s 卡片未跳夸克（应默认跳夸克）' % (slug, cid))
+    ok('D2 分类页卡片主按钮默认跳夸克链接')
+
+    # ── stack.js：随机/最近两个动态叠的存在与"每次展开重洗" ──
+    st = read(os.path.join(ROOT, 'assets', 'js', 'stack.js'))
+    for k in ('recent', 'all'):
+        if ("key: '%s'" % k) not in st:
+            bad('D2 stack.js 缺少动态牌叠 %s' % k)
+    else:
+        ok('D2 stack.js 含「最近更新」+「全部 mod」两个动态牌叠')
+
+    if re.search(r'reshuffle:\s*true', st):
+        ok('D2 「全部 mod」叠声明了 reshuffle（每次展开重随机）')
+    else:
+        bad('D2 「全部 mod」叠未声明 reshuffle（不会重随机）')
+
+    mjs = read(os.path.join(ROOT, 'assets', 'js', 'mods.js'))
+    if 'export function recentLevels' in mjs and 'export function randomMods' in mjs:
+        ok('D2 mods.js 导出 recentLevels / randomMods 采样函数')
+    else:
+        bad('D2 mods.js 缺 recentLevels / randomMods 采样函数')
+
+    if 'export function primaryUrl' in mjs:
+        ok('D2 mods.js 导出 primaryUrl（卡片默认去向：夸克优先）')
+    else:
+        bad('D2 mods.js 缺 primaryUrl（卡片默认跳夸克未生效）')
 
 
 # ══════════════════════════════════════════════════════════════
@@ -360,7 +517,388 @@ def check_a11y():
 
 
 # ══════════════════════════════════════════════════════════════
-# F. 负面用例
+# F. 云服务接入（静态可验证部分）
+#
+#   真正打云端的验证在 _verify_cloud.js（必须跑在发布域上，
+#   因为 Web 端按 exact Origin 绑定）。这里只做**静态**断言，
+#   把「配置齐全 / 无裸 fetch / 调用点都带 endpoint + key」钉死。
+# ══════════════════════════════════════════════════════════════
+
+def check_cloud():
+    jsdir = os.path.join(ROOT, 'assets', 'js')
+    cloud_p = os.path.join(jsdir, 'cloud.js')
+    ui_p = os.path.join(jsdir, 'cloud-ui.js')
+
+    if not os.path.exists(cloud_p):
+        bad('F cloud.js 不存在（云接入缺失）')
+        return
+    if not os.path.exists(ui_p):
+        bad('F cloud-ui.js 不存在（云 UI 缺失）')
+        return
+
+    cloud = _read(cloud_p)
+    ui = _read(ui_p)
+
+    # ── F1. publicConfig 三个值齐备且非占位 ──────────────────
+    need = {
+        'resourceId': r"resourceId:\s*'(wbcs_[A-Za-z0-9]+)'",
+        'endpoint': r"endpoint:\s*'(https://[^']+)'",
+        'publishableKey': r"publishableKey:\s*'(wbpk_[A-Za-z0-9_]+)'",
+    }
+    missing = []
+    for k, pat in need.items():
+        m = re.search(pat, cloud)
+        if not m:
+            missing.append(k)
+    if missing:
+        bad('F publicConfig 缺字段或格式不对：' + ', '.join(missing))
+    else:
+        ok('F publicConfig 三值齐备（resourceId / endpoint / publishableKey）')
+
+    # ── F2. endpoint 必须来自 publicConfig，不许硬编码在别处 ──
+    #      （在 cloud.js 里只允许出现一次，即配置对象那行）
+    ep_hits = re.findall(r"https://pvz-mods-gallery\.app\.workbuddy\.host", cloud)
+    if len(ep_hits) > 1:
+        bad('F endpoint 字面量出现 %d 次（应只在 publicConfig 中一次）' % len(ep_hits))
+    else:
+        ok('F endpoint 仅出现在 publicConfig 一处（无散落硬编码）')
+
+    # ── F3. 初始化必须同时传 endpoint 与 publishableKey ──────
+    initm = re.search(r'createWorkBuddyCloud\(\{([^}]*)\}', cloud, re.S)
+    if not initm:
+        bad('F 未找到 createWorkBuddyCloud 初始化调用')
+    else:
+        body = initm.group(1)
+        has_ep = 'endpoint' in body
+        has_pk = 'publishableKey' in body
+        if has_ep and has_pk:
+            ok('F 初始化同时传入 endpoint + publishableKey')
+        else:
+            bad('F 初始化缺参数：%s'
+                % ', '.join([x for x, v in
+                             [('endpoint', has_ep), ('publishableKey', has_pk)] if not v]))
+
+    # ── F4. 禁止手写 fetch 打 /.cloud/** ─────────────────────
+    both = cloud + '\n' + ui
+    if re.search(r"fetch\(\s*['\"`][^'\"`]*/\.cloud/", both):
+        bad('F 出现手写 fetch 打 /.cloud/**（应一律走 SDK）')
+    else:
+        ok('F 无手写 fetch 打 /.cloud/**（全部经 SDK）')
+
+    # ── F5. 禁止引入第二套客户端（cloudbase / supabase）──────
+    badsdk = []
+    for name in ('@cloudbase/js-sdk', 'createClient(', 'supabase'):
+        if name in both:
+            badsdk.append(name)
+    if badsdk:
+        bad('F 引入了他家客户端：' + ', '.join(badsdk))
+    else:
+        ok('F 未引入 cloudbase/supabase 等第二套客户端')
+
+    # ── F6. CDN 形式：用 @dev 频道且挂全局 ───────────────────
+    cdnm = re.search(r"jsdelivr\.net/npm/@tencent-ai/workbuddy-cloud-sdk@([\w.\-]+)/", cloud)
+    if not cdnm:
+        bad('F 未找到 SDK CDN 地址')
+    elif cdnm.group(1) == 'latest':
+        bad('F SDK 用了 @latest 频道（应用 @dev）')
+    else:
+        ok('F SDK 走 CDN @%s 频道（非 @latest）' % cdnm.group(1))
+    if 'WorkBuddyCloud' in cloud:
+        ok('F 通过 WorkBuddyCloud 全局访问（CDN/IIFE 形式）')
+    else:
+        ok('F 云客户端入口已定义')
+
+    # ── F7. 禁止匿名登录 / 本地假会话 ───────────────────────
+    if re.search(r'signInAnonymously|createMockSession|fakeSession', both):
+        bad('F 出现匿名登录或伪造会话')
+    else:
+        ok('F 无匿名登录 / 伪造会话')
+
+    # ── F8. 计数写入必须走 RPC，不许客户端直改计数列 ─────────
+    #      直改 = 任意篡改；只有 SECURITY DEFINER 的 bump_* 能改
+    #      函数名以字面量传入 callBump(...) → 内层 .rpc(fn, ...)
+    rpc_dl = "'bump_mod_download'" in cloud
+    rpc_lk = "'bump_mod_like'" in cloud
+    rpc_call = re.search(r"\.rpc\(\s*fn\s*,", cloud) is not None
+    direct = re.search(r"from\('mod_stats'\)[\s\S]{0,120}?\.update\(", cloud)
+    if direct:
+        bad('F 客户端直接 update mod_stats（可被篡改）')
+    elif rpc_dl and rpc_lk and rpc_call:
+        ok('F 计数写入走 RPC（bump_mod_download / bump_mod_like）')
+    else:
+        bad('F 未找到计数 RPC 调用（dl=%s lk=%s call=%s）'
+            % (rpc_dl, rpc_lk, rpc_call))
+
+    # ── F9. 写留言不得自带 owner_id（须由 DEFAULT auth.uid() 填）─
+    ins = re.search(r"from\('mod_comments'\)\s*\.insert\(\{([^}]*)\}", cloud, re.S)
+    if not ins:
+        bad('F 未找到 mod_comments 插入调用')
+    elif 'owner_id' in ins.group(1):
+        bad('F 插入留言时自带了 owner_id（应由服务端 DEFAULT 填）')
+    else:
+        ok('F 插入留言未自带 owner_id（服务端 DEFAULT 填充）')
+
+    # ── F10. 页面挂钩点齐备 ─────────────────────────────────
+    detail = _walk(ROOT, '.html')
+    hooks = {'data-like-btn': 0, 'data-comments': 0, 'data-auth-panel': 0,
+             'data-comment-form': 0, 'data-comment-gate': 0}
+    for p in detail:
+        t = _read(p)
+        for h in hooks:
+            if h in t:
+                hooks[h] += 1
+    absent = [h for h, n in hooks.items() if n == 0]
+    if absent:
+        bad('F 详情页缺少云挂钩点：' + ', '.join(absent))
+    else:
+        ok('F 8 个详情页均含点赞 / 留言 / 登录面板挂钩点')
+
+    # 首页与分类页的卡片需要 data-mod-card（计数徽章的落点）
+    cardhosts = 0
+    for p in detail:
+        if 'data-mod-card' in _read(p):
+            cardhosts += 1
+    if cardhosts >= 3:
+        ok('F %d 个页面含 data-mod-card（计数徽章可落点）' % cardhosts)
+    else:
+        bad('F data-mod-card 落点不足（仅 %d 个页面）' % cardhosts)
+
+    # ── F11. app.js 必须初始化云 UI ──────────────────────────
+    app = _read(os.path.join(jsdir, 'app.js'))
+    if 'initCloudUi' in app and 'cloud-ui.js' in app:
+        ok('F app.js 已接线 initCloudUi')
+    else:
+        bad('F app.js 未接线 initCloudUi')
+
+
+# ══════════════════════════════════════════════════════════════
+# H. 视觉效果层（星云背景 / 标题浮动 / 指针拖尾）
+# ══════════════════════════════════════════════════════════════
+
+def check_effects():
+    """断言三层视觉增强的**机制**都在，且降级路径完整。
+
+    ⚠️ 这里刻意只验"机制与降级"，不去验"好不好看"——
+       观感由截图人眼判定；能自动化的只有结构约束。
+    """
+    cssdir = os.path.join(ROOT, 'assets', 'css')
+    jsdir = os.path.join(ROOT, 'assets', 'js')
+
+    def css(name):
+        return _read(os.path.join(cssdir, name))
+
+    def js(name):
+        return _read(os.path.join(jsdir, name))
+
+    base = css('base.css')
+    pages = css('pages.css')
+    comp = css('components.css')
+    tokens = css('tokens.css')
+    idx = _read(os.path.join(ROOT, 'index.html'))
+    app = js('app.js')
+    shell = js('shell.js')
+
+    # ── H1. 背景层结构：.bg 必须压在最底下（负层级）──────────
+    if re.search(r'\.bg\s*\{[^}]*z-index:\s*var\(--z-bg\)', base):
+        ok('H1 背景层用负层级 --z-bg（不会盖住正文）')
+    else:
+        bad('H1 背景层没有用负层级 --z-bg')
+
+    if re.search(r'--z-bg:\s*-\d+', tokens):
+        ok('H1 --z-bg 取值为负')
+    else:
+        bad('H1 --z-bg 不是负值')
+
+    # ── H2. 底渐变必须是参考站的深海军蓝径向渐变 ────────────
+    if 'radial-gradient' in base and 'at 50% 0%' in base:
+        ok('H2 底为径向渐变且锚在顶部中央（还原参考站）')
+    else:
+        bad('H2 底不是"顶部中央"的径向渐变')
+
+    for name, lit in (('--bg-nebula-core', '#000d4d'),
+                      ('--bg-nebula-edge', '#000105')):
+        if re.search(re.escape(name) + r':\s*' + re.escape(lit), tokens):
+            ok('H2 %s = %s（参考站取色）' % (name, lit))
+        else:
+            bad('H2 %s 不是参考站的 %s' % (name, lit))
+
+    # ── H3. 星云模块：结构 + 性能口径 ────────────────────────
+    if not os.path.exists(os.path.join(jsdir, 'nebula.js')):
+        bad('H3 nebula.js 不存在')
+        return
+
+    neb = js('nebula.js')
+    # ⚠️ 扫描代码前必须先剥掉注释：
+    #    本文件的注释里**专门写了**"不绑 touchmove 的 preventDefault"，
+    #    直接正则扫源码会把这句说明当成违规命中（实测踩过这个假红）。
+    neb_code = re.sub(r'/\*.*?\*/', '', neb, flags=re.S)
+    neb_code = re.sub(r'^\s*//.*$', '', neb_code, flags=re.M)
+
+    if 'initNebula' in neb and 'initNebula' in app and 'nebula.js' in app:
+        ok('H3 nebula.js 已接线 initNebula')
+    else:
+        bad('H3 nebula.js 未接线到 app.js')
+
+    # 旧的流星雨必须彻底移除（替换而不是并存）
+    if os.path.exists(os.path.join(jsdir, 'starfield.js')):
+        bad('H3 starfield.js 仍存在（流星雨未替换干净）')
+    elif 'starfield' in app or 'starfield' in base:
+        bad('H3 仍有 starfield 残留引用')
+    else:
+        ok('H3 流星雨已完全移除，无 starfield 残留')
+
+    # 叠加发光 = 星云的本质
+    if "globalCompositeOperation = 'lighter'" in neb:
+        ok("H3 用 'lighter' 叠加发光（星云的核心观感）")
+    else:
+        bad("H3 缺少 'lighter' 叠加发光")
+
+    # ★ 性能：渐变必须预渲染成精灵，不能逐帧 createRadialGradient
+    if 'createRadialGradient' in neb and 'drawImage' in neb:
+        # 只允许在 makeSprite 里调用，且 drawImage 在渲染循环里
+        call_sites = [m.start() for m in re.finditer(r'createRadialGradient', neb)]
+        in_sprite = [m.start() for m in re.finditer(r'function makeSprite', neb)]
+        sprite_end = neb.find('\n}', in_sprite[0]) if in_sprite else -1
+        if in_sprite and all(m < sprite_end for m in call_sites):
+            ok('H3 渐变只在精灵预渲染阶段创建（逐帧零 createRadialGradient）')
+        else:
+            bad('H3 渐变出现在渲染热路径里（逐帧创建会掉帧）')
+    else:
+        bad('H3 没有走"预渲染精灵 + drawImage"的渲染方式')
+
+    # 参考站的关键机制必须保留
+    for label, pat in (('相机视差', r'PARALLAX'),
+                       ('轨道漂移', r'ORBIT_R'),
+                       ('整体自转', r'ROT_SPEED'),
+                       ('透视投影', r'FOCAL'),
+                       ('近裁剪', r'NEAR')):
+        if re.search(pat, neb):
+            ok('H3 保留参考站机制：%s' % label)
+        else:
+            bad('H3 丢失参考站机制：%s' % label)
+
+    # ★ 内容站安全红线：绝不能 preventDefault 掉触摸滚动
+    if re.search(r'touchmove', neb_code) and 'preventDefault' in neb_code:
+        bad('H3 nebula.js 拦了 touchmove（会锁死移动端滚动）')
+    else:
+        ok('H3 未拦截 touchmove（移动端滚动不受影响）')
+
+    # ★ 增点必须有上限（原站会无限增长 ⇒ 内存泄漏）
+    if re.search(r'capCount', neb) and re.search(r'liveCount >= capCount', neb):
+        ok('H3 点击增点有硬上限（不会无限增长）')
+    else:
+        bad('H3 点击增点没有上限（内存会无限增长）')
+
+    # 降级：DPR 上限 2
+    if re.search(r'Math\.min\(devicePixelRatio[^)]*,\s*2\)', neb):
+        ok('H3 DPR 上限 2（4K 屏不做无谓的超采样）')
+    else:
+        bad('H3 DPR 没有上限')
+
+    if 'prefersReduced' in neb and 'visibilitychange' in neb:
+        ok('H3 星云含 reduced-motion 与后台暂停降级')
+    else:
+        bad('H3 星云缺少降级分支')
+
+    # ── H4. 标题浮动：两层结构，动画必须挂在内层 ─────────────
+    if 'hero__word' in idx:
+        ok('H4 标题用「外层行 + 内层词」两层结构')
+    else:
+        bad('H4 标题没有内层词元素（浮动会被 reveal 覆盖）')
+
+    if re.search(r'\.hero__word\s*\{[^}]*animation:\s*hero-float', pages):
+        ok('H4 hero-float 挂在内层 .hero__word')
+    else:
+        bad('H4 hero-float 没有挂在内层')
+
+    if re.search(r'\.hero__line\s*\{[^}]*display:\s*block', pages):
+        ok('H4 外层 .hero__line 是 block（四行各自成行）')
+    else:
+        bad('H4 外层 .hero__line 不是 block')
+
+    # 逐词相位必须**各不相同**（否则就是"排队一起跳"，等于没做）
+    delays = re.findall(
+        r'\.hero__line:nth-child\(\d\)\s+\.hero__word\s*\{([^}]*)\}', pages)
+    if len(delays) == 4:
+        ds = [re.search(r'--delay:\s*(-?[\d.]+)s', d) for d in delays]
+        if all(ds) and len({d.group(1) for d in ds}) == 4:
+            ok('H4 四个词的浮动相位互不相同（不是整块同步跳）')
+        else:
+            bad('H4 存在相位重复的词（会看成同步跳动）')
+    else:
+        bad('H4 逐词浮动规则不完整（应为 4 条，实为 %d）' % len(delays))
+
+    # 字面质感：渐变填充
+    if '-webkit-background-clip: text' in pages and 'filter: drop-shadow' in pages:
+        ok('H4 标题用渐变字面 + drop-shadow 光晕（text-shadow 与渐变冲突）')
+    else:
+        bad('H4 标题缺少渐变字面或光晕')
+
+    if 'text-shadow' in pages.split('.hero__word')[1].split('}')[0]:
+        bad('H4 .hero__word 上用了 text-shadow（会和渐变字面打架）')
+    else:
+        ok('H4 .hero__word 未误用 text-shadow')
+
+    # reduced-motion 必须只关内层浮动
+    rm_block = pages.split('prefers-reduced-motion')[-1]
+    if 'hero__word' in rm_block and 'animation: none' in rm_block:
+        ok('H4 reduced-motion 关掉了标题浮动')
+    else:
+        bad('H4 reduced-motion 没有关标题浮动')
+
+    # ── H5. 指针拖尾 ────────────────────────────────────────
+    if not os.path.exists(os.path.join(jsdir, 'cursor-trail.js')):
+        bad('H5 cursor-trail.js 不存在')
+        return
+
+    trail = js('cursor-trail.js')
+
+    if 'initCursorTrail' in trail and 'initCursorTrail' in app:
+        ok('H5 cursor-trail.js 已接线 initCursorTrail')
+    else:
+        bad('H5 cursor-trail.js 未接线到 app.js')
+
+    # 必须是对象池，不能逐帧 new 粒子
+    if 'pool' in trail and re.search(r'const pool = new Array\(', trail):
+        ok('H5 粒子用预分配对象池（运行期零分配）')
+    else:
+        bad('H5 粒子没有用对象池')
+
+    # 桌面独占 + reduced-motion 降级
+    if '(hover: hover) and (pointer: fine)' in trail:
+        ok('H5 拖尾只在精细指针设备启用（触屏不空转）')
+    else:
+        bad('H5 拖尾没有限定精细指针')
+
+    if 'prefersReduced' in trail:
+        ok('H5 拖尾含 reduced-motion 降级')
+    else:
+        bad('H5 拖尾缺少 reduced-motion 降级')
+
+    # 绝不能挡住点击
+    if re.search(r'\.cursor-trail\s*\{[^}]*pointer-events:\s*none', comp):
+        ok('H5 拖尾画布 pointer-events:none（不挡交互）')
+    else:
+        bad('H5 拖尾画布会挡住点击')
+
+    # ── H6. 背景层由 shell 统一注入（11 页一致）─────────────
+    if 'bgHTML' in shell and 'class="bg"' in shell:
+        ok('H6 背景层由 shell.js 统一注入（单一真源）')
+    else:
+        bad('H6 背景层没有统一注入')
+
+    hosts = 0
+    for p in walk_html():
+        if 'data-shell-nav' in _read(p):
+            hosts += 1
+    if hosts == len(walk_html()):
+        ok('H6 全部 %d 个页面都走 shell 注入（背景不会漏页）' % hosts)
+    else:
+        bad('H6 有页面没走 shell 注入（%d/%d）' % (hosts, len(walk_html())))
+
+
+# ══════════════════════════════════════════════════════════════
+# G. 负面用例
 # ══════════════════════════════════════════════════════════════
 
 def run_neg():
@@ -420,6 +958,147 @@ def run_neg():
     with open(p5, 'w', encoding='utf-8', newline='') as f:
         f.write(t5 + '\n.mod-card__media img { object-fit: cover; }\n')
     cases.append(('把封面容器改回 object-fit:cover', dst5, 'cover'))
+
+    # 6) 云：把手写 fetch 打进 /.cloud/** → F 应报错
+    tmp6 = tempfile.mkdtemp(prefix='pvz_neg_')
+    dst6 = os.path.join(tmp6, 'site')
+    _copy_tree(ROOT, dst6)
+    p6 = os.path.join(dst6, 'assets', 'js', 'cloud.js')
+    with open(p6, encoding='utf-8') as f:
+        t6 = f.read()
+    with open(p6, 'w', encoding='utf-8', newline='') as f:
+        f.write(t6 + "\nfetch('/.cloud/database/rest/mod_stats');\n")
+    cases.append(('手写 fetch 打 /.cloud/**', dst6, 'cloudfetch'))
+
+    # 7) 云：把计数写入改成客户端直改 → F 应报错
+    tmp7 = tempfile.mkdtemp(prefix='pvz_neg_')
+    dst7 = os.path.join(tmp7, 'site')
+    _copy_tree(ROOT, dst7)
+    p7 = os.path.join(dst7, 'assets', 'js', 'cloud.js')
+    with open(p7, encoding='utf-8') as f:
+        t7 = f.read()
+    with open(p7, 'w', encoding='utf-8', newline='') as f:
+        f.write(t7 + "\ncloud.database.from('mod_stats').update({ downloads: 9 });\n")
+    cases.append(('客户端直改 mod_stats 计数', dst7, 'cloudupdate'))
+
+    # 8) 云：初始化漏掉 endpoint → F 应报错
+    tmp8 = tempfile.mkdtemp(prefix='pvz_neg_')
+    dst8 = os.path.join(tmp8, 'site')
+    _copy_tree(ROOT, dst8)
+    p8 = os.path.join(dst8, 'assets', 'js', 'cloud.js')
+    with open(p8, encoding='utf-8') as f:
+        t8 = f.read()
+    t8 = t8.replace("endpoint: PUBLIC_CONFIG.endpoint,", "")
+    with open(p8, 'w', encoding='utf-8', newline='') as f:
+        f.write(t8)
+    cases.append(('初始化漏传 endpoint', dst8, 'cloudnoep'))
+
+    # 9) 云：插入留言时自带 owner_id → F 应报错
+    tmp9 = tempfile.mkdtemp(prefix='pvz_neg_')
+    dst9 = os.path.join(tmp9, 'site')
+    _copy_tree(ROOT, dst9)
+    p9 = os.path.join(dst9, 'assets', 'js', 'cloud.js')
+    with open(p9, encoding='utf-8') as f:
+        t9 = f.read()
+    t9 = t9.replace("mod_id: modId,\n      body: body,",
+                    "mod_id: modId,\n      owner_id: 'forged',\n      body: body,")
+    with open(p9, 'w', encoding='utf-8', newline='') as f:
+        f.write(t9)
+    cases.append(('插入留言自带 owner_id', dst9, 'cloudowner'))
+
+    # 10) 效果：把标题浮动挂回外层 .hero__line → H 应报错
+    tmp10 = tempfile.mkdtemp(prefix='pvz_neg_')
+    dst10 = os.path.join(tmp10, 'site')
+    _copy_tree(ROOT, dst10)
+    p10 = os.path.join(dst10, 'assets', 'css', 'pages.css')
+    with open(p10, encoding='utf-8') as f:
+        t10 = f.read()
+    # 删掉内层浮动规则，等于把动画退回外层（会被 reveal 覆盖）
+    t10 = t10.replace('animation: hero-float var(--dur, 9s)',
+                      'animation: none')
+    with open(p10, 'w', encoding='utf-8', newline='') as f:
+        f.write(t10)
+    cases.append(('标题浮动退回外层（会被 reveal 覆盖）', dst10, 'herofloat'))
+
+    # 11) 效果：把星云改成逐帧 createRadialGradient → H 应报错
+    tmp11 = tempfile.mkdtemp(prefix='pvz_neg_')
+    dst11 = os.path.join(tmp11, 'site')
+    _copy_tree(ROOT, dst11)
+    p11 = os.path.join(dst11, 'assets', 'js', 'nebula.js')
+    with open(p11, encoding='utf-8') as f:
+        t11 = f.read()
+    # 在渲染循环里插一次渐变创建
+    t11 = t11.replace('    ctx.clearRect(0, 0, W, H);',
+                      '    ctx.createRadialGradient(0,0,0,0,0,1);\n'
+                      '    ctx.clearRect(0, 0, W, H);')
+    with open(p11, 'w', encoding='utf-8', newline='') as f:
+        f.write(t11)
+    cases.append(('星云逐帧创建渐变（会掉帧）', dst11, 'nebsprite'))
+
+    # 12) 效果：背景层丢掉负层级 → H 应报错
+    tmp12 = tempfile.mkdtemp(prefix='pvz_neg_')
+    dst12 = os.path.join(tmp12, 'site')
+    _copy_tree(ROOT, dst12)
+    p12 = os.path.join(dst12, 'assets', 'css', 'tokens.css')
+    with open(p12, encoding='utf-8') as f:
+        t12 = f.read()
+    t12 = t12.replace('--z-bg:      -1;', '--z-bg:      0;')
+    with open(p12, 'w', encoding='utf-8', newline='') as f:
+        f.write(t12)
+    cases.append(('背景层丢掉负层级（会盖住正文）', dst12, 'bgz'))
+
+    # 13) 效果：拖尾画布可以挡点击 → H 应报错
+    tmp13 = tempfile.mkdtemp(prefix='pvz_neg_')
+    dst13 = os.path.join(tmp13, 'site')
+    _copy_tree(ROOT, dst13)
+    p13 = os.path.join(dst13, 'assets', 'css', 'components.css')
+    with open(p13, encoding='utf-8') as f:
+        t13 = f.read()
+    t13 = t13.replace('  pointer-events: none;         /* ★ 绝不挡点击 */',
+                      '  pointer-events: auto;')
+    with open(p13, 'w', encoding='utf-8', newline='') as f:
+        f.write(t13)
+    cases.append(('拖尾画布挡住点击', dst13, 'trailclick'))
+
+    # 14) 夸克：把某 mod 详情页的夸克按钮删掉 → D2 应报错
+    #     （真实缺陷重现：早前 pandorapool 的 dl_html 被后续赋值覆盖，
+    #       渲染出的按钮里没有夸克 —— 这条用例就是钉住它不再复发）
+    tmp14 = tempfile.mkdtemp(prefix='pvz_neg_')
+    dst14 = os.path.join(tmp14, 'site')
+    _copy_tree(ROOT, dst14)
+    p14 = os.path.join(dst14, 'mod', 'pandorapool.html')
+    with open(p14, encoding='utf-8') as f:
+        t14 = f.read()
+    t14 = t14.replace('夸克网盘下载', '点我下载')
+    with open(p14, 'w', encoding='utf-8', newline='') as f:
+        f.write(t14)
+    cases.append(('详情页丢失夸克下载按钮', dst14, 'noquarkbtn'))
+
+    # 15) 夸克：把 mods.js 里某 mod 的链接串成别家的 → D2 应报错
+    #     （"链接错行"是数据表最容易出的错，且肉眼极难发现）
+    tmp15 = tempfile.mkdtemp(prefix='pvz_neg_')
+    dst15 = os.path.join(tmp15, 'site')
+    _copy_tree(ROOT, dst15)
+    p15 = os.path.join(dst15, 'assets', 'js', 'mods.js')
+    with open(p15, encoding='utf-8') as f:
+        t15 = f.read()
+    t15 = t15.replace('pandorapool: \'https://pan.quark.cn/s/b9c9a19766c6\'',
+                      'pandorapool: \'https://pan.quark.cn/s/7ecbb59a05cc\'')
+    with open(p15, 'w', encoding='utf-8', newline='') as f:
+        f.write(t15)
+    cases.append(('夸克链接串行（pandora↔vampire）', dst15, 'quarkdup'))
+
+    # 16) 动态叠：删掉 reshuffle → D2 应报错
+    tmp16 = tempfile.mkdtemp(prefix='pvz_neg_')
+    dst16 = os.path.join(tmp16, 'site')
+    _copy_tree(ROOT, dst16)
+    p16 = os.path.join(dst16, 'assets', 'js', 'stack.js')
+    with open(p16, encoding='utf-8') as f:
+        t16 = f.read()
+    t16 = t16.replace('reshuffle: true', 'reshuffle: false')
+    with open(p16, 'w', encoding='utf-8', newline='') as f:
+        f.write(t16)
+    cases.append(('「全部 mod」叠丢失 reshuffle', dst16, 'noreshuffle'))
 
     caught = 0
     for label, site, kind in cases:
@@ -501,6 +1180,74 @@ def probe(site, kind):
                     out.append('%s 用了 object-fit:cover（会裁切方图）' % sel)
                     break
 
+    elif kind == 'cloudfetch':
+        t = _read(os.path.join(site, 'assets', 'js', 'cloud.js'))
+        if re.search(r"fetch\(\s*['\"`][^'\"`]*/\.cloud/", t):
+            out.append('cloud.js 手写 fetch 打 /.cloud/**')
+
+    elif kind == 'cloudupdate':
+        t = _read(os.path.join(site, 'assets', 'js', 'cloud.js'))
+        if re.search(r"from\('mod_stats'\)[\s\S]{0,120}?\.update\(", t):
+            out.append('cloud.js 直接 update mod_stats')
+
+    elif kind == 'cloudnoep':
+        t = _read(os.path.join(site, 'assets', 'js', 'cloud.js'))
+        m = re.search(r'createWorkBuddyCloud\(\{([^}]*)\}', t, re.S)
+        if not m or 'endpoint' not in m.group(1):
+            out.append('createWorkBuddyCloud 初始化漏传 endpoint')
+
+    elif kind == 'cloudowner':
+        t = _read(os.path.join(site, 'assets', 'js', 'cloud.js'))
+        m = re.search(r"from\('mod_comments'\)\s*\.insert\(\{([^}]*)\}", t, re.S)
+        if m and 'owner_id' in m.group(1):
+            out.append('插入 mod_comments 时自带 owner_id')
+
+    elif kind == 'herofloat':
+        pages_p = os.path.join(site, 'assets', 'css', 'pages.css')
+        t = _read(pages_p)
+        if not re.search(r'\.hero__word\s*\{[^}]*animation:\s*hero-float', t):
+            out.append('hero-float 没有挂在内层 .hero__word')
+
+    elif kind == 'nebsprite':
+        t = _read(os.path.join(site, 'assets', 'js', 'nebula.js'))
+        hits = [m.start() for m in re.finditer(r'createRadialGradient', t)]
+        marks = [m.start() for m in re.finditer(r'function makeSprite', t)]
+        if marks:
+            end = t.find('\n}', marks[0])
+            if any(h > end for h in hits):
+                out.append('渐变出现在渲染热路径里（逐帧创建）')
+
+    elif kind == 'bgz':
+        t = _read(os.path.join(site, 'assets', 'css', 'tokens.css'))
+        m = re.search(r'--z-bg:\s*(-?\d+)', t)
+        if not m or int(m.group(1)) >= 0:
+            out.append('--z-bg 不是负值（背景会盖住正文）')
+
+    elif kind == 'trailclick':
+        t = _read(os.path.join(site, 'assets', 'css', 'components.css'))
+        m = re.search(r'\.cursor-trail\s*\{([^}]*)\}', t)
+        if not m or not re.search(r'pointer-events:\s*none', m.group(1)):
+            out.append('拖尾画布没有 pointer-events:none（会挡点击）')
+
+    elif kind == 'noquarkbtn':
+        t = _read(os.path.join(site, 'mod', 'pandorapool.html'))
+        blk_m = re.search(r'data-download-block.*?</div>\s*</div>', t, re.S)
+        blk = blk_m.group(0) if blk_m else t
+        if '夸克网盘下载' not in blk:
+            out.append('详情页下载块缺夸克下载按钮')
+
+    elif kind == 'quarkdup':
+        js = _read(os.path.join(site, 'assets', 'js', 'mods.js'))
+        _, per = parse_quark_map(js)
+        urls = list(per.values())
+        if len(set(urls)) != len(urls):
+            out.append('夸克链接重复（不同 mod 共用了同一链接）')
+
+    elif kind == 'noreshuffle':
+        st = _read(os.path.join(site, 'assets', 'js', 'stack.js'))
+        if not re.search(r'reshuffle:\s*true', st):
+            out.append('「全部 mod」叠未声明 reshuffle（不会每次重随机）')
+
     return out
 
 
@@ -530,7 +1277,8 @@ def main():
     check_wiring()
     check_data()
     check_a11y()
-
+    check_cloud()
+    check_effects()
     print('\n通过 %d 项：' % len(PASS))
     for m in PASS:
         print('  ✓ %s' % m)

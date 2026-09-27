@@ -2,8 +2,11 @@
    _verify_interaction.js — 真机浏览器验证牌叠交互
 
    验证项：
-     1. 首页三叠渲染，每叠卡片数与分类数据一致
-     2. 悬停某叠 → 该叠铺开（首末卡间距显著变大）+ 另两叠淡出
+     0. 首页五叠渲染（3 分类静态叠 + 「最近更新」/「全部 mod」两个动态叠）
+     0b.「全部 mod」叠每次展开重随机；「最近更新」叠顺序稳定且 = recentLevels(3)
+     0c. 动态叠卡片点击默认跳夸克链接
+     1. 每叠卡片数与分类数据一致（plant 3 / zombie 4 / other 4）
+     2. 悬停某叠 → 该叠铺开（首末卡间距显著变大）+ 其余叠淡出
      3. 铺开宽度 > 列宽（证明"整行铺开"确实生效，没有被子列裁切）
      4. 悬停卡片 → 信息浮窗可见（opacity=1）
      5. 移动端 375px → 降级为横向 scroll-snap 卡条，无旋转
@@ -48,10 +51,14 @@ function head(m) { console.log('\n── ' + m + ' ──'); }
 
   await page.goto(BASE + '/', { waitUntil: 'networkidle' });
 
-  // 1. 三叠渲染
+  // 1. 五叠渲染（3 静态分类叠 + 2 动态叠）
+  //   ⚠️ dataset 取到的是**字符串** "true"/"false"，直接当布尔用会把
+  //      "false" 也算成真值（"false" is truthy）—— 必须显式比较。
   const stackInfo = await page.evaluate(() => {
     return [...document.querySelectorAll('.stack')].map((s) => ({
       cat: s.dataset.category,
+      dyn: s.dataset.dynamic === 'true',
+      reshuffle: s.dataset.reshuffle === 'true',
       count: Number(s.dataset.count),
       cards: s.querySelectorAll('.stack__card').length,
       hasMore: !!s.querySelector('.stack__card--more'),
@@ -59,18 +66,114 @@ function head(m) { console.log('\n── ' + m + ' ──'); }
   });
   console.log('    ', JSON.stringify(stackInfo));
 
-  if (stackInfo.length === 3) ok('首页渲染出 3 个牌叠');
-  else bad(`牌叠数应为 3，实际 ${stackInfo.length}`);
+  if (stackInfo.length === 5) ok('首页渲染出 5 个牌叠（3 分类 + 2 动态）');
+  else bad(`牌叠数应为 5，实际 ${stackInfo.length}`);
 
-  const expect = { plant: 2, zombie: 3, other: 3 };
-  for (const s of stackInfo) {
+  const dynKeys = stackInfo.filter((s) => s.dyn).map((s) => s.cat);
+  if (dynKeys.includes('recent') && dynKeys.includes('all')) {
+    ok('含「最近更新」+「全部 mod」两个动态叠');
+  } else {
+    bad('动态叠缺失，实际：' + JSON.stringify(dynKeys));
+  }
+
+  const allStack = stackInfo.find((s) => s.cat === 'all');
+  if (allStack && allStack.reshuffle) {
+    ok('「全部 mod」叠声明 data-reshuffle=true（每次展开重随机）');
+  } else {
+    bad('「全部 mod」叠未声明 data-reshuffle=true');
+  }
+
+  // 动态叠必须各渲染 3 张卡且不带「更多 mod」
+  for (const s of stackInfo.filter((x) => x.dyn)) {
+    if (s.cards !== 3) bad(`${s.cat} 动态叠应渲染 3 张卡，实际 ${s.cards}`);
+    if (s.hasMore) bad(`${s.cat} 动态叠不该出现「更多 mod」卡`);
+  }
+  if (!F.length) ok('两个动态叠各渲染 3 张卡且无「更多 mod」卡');
+
+  const expect = { plant: 3, zombie: 4, other: 4 };
+  for (const s of stackInfo.filter((x) => !x.dyn)) {
     if (s.count !== expect[s.cat]) {
       bad(`${s.cat} 叠 mod 数应为 ${expect[s.cat]}，实际 ${s.count}`);
     }
     // plant/zombie/other 都 ≤5 ⇒ 不应出现「更多 mod」卡
     if (s.hasMore) bad(`${s.cat} 只有 ${s.count} 个 mod（≤5），不该出现「更多 mod」卡`);
   }
-  if (!F.length) ok('各叠 mod 数与数据层一致（2/3/3），且无多余的「更多 mod」卡');
+  if (!F.length) ok('各静态叠 mod 数与数据层一致（3/4/4），且无多余的「更多 mod」卡');
+
+  // 1b. 「全部 mod」叠每次展开都要换一批（这是用户点名的行为）
+  const drawOnce = async () => {
+    await page.mouse.move(10, 10);
+    await page.waitForTimeout(160);
+    await page.hover('.stack[data-category="all"] .stack__label');
+    await page.waitForTimeout(320);
+    return page.evaluate(() =>
+      [...document.querySelectorAll('.stack[data-category="all"] .mod-card')]
+        .map((c) => c.getAttribute('data-mod-card')).sort());
+  };
+  const draws = [];
+  for (let i = 0; i < 6; i++) draws.push((await drawOnce()).join('|'));
+  const uniq = new Set(draws);
+  console.log('     6 次展开取样 =', [...uniq].map((d) => d.replace(/\|/g, '+')));
+  if (uniq.size >= 2) {
+    ok(`「全部 mod」叠 ${uniq.size}/6 次取样互不相同（确实在重随机）`);
+  } else {
+    bad('「全部 mod」叠每次展开都是同一批（reshuffle 没生效）');
+  }
+
+  // 1c. 「最近更新」叠顺序稳定（是"最近"而非"随机"）
+  const readRecent = () => page.evaluate(() =>
+    [...document.querySelectorAll('.stack[data-category="recent"] .mod-card')]
+      .map((c) => c.getAttribute('data-mod-card')));
+  await page.mouse.move(10, 10);
+  await page.waitForTimeout(160);
+  await page.hover('.stack[data-category="recent"] .stack__label');
+  await page.waitForTimeout(320);
+  const recentA = await readRecent();
+  await page.mouse.move(10, 10);
+  await page.waitForTimeout(200);
+  await page.hover('.stack[data-category="recent"] .stack__label');
+  await page.waitForTimeout(320);
+  const recentB = await readRecent();
+  console.log('     最近更新取样 =', recentA);
+  if (recentA.join('|') === recentB.join('|') && recentA.length === 3) {
+    ok('「最近更新」叠两次展开顺序一致（按更新时间，非随机）');
+  } else {
+    bad('「最近更新」叠顺序不稳定或卡数 ≠ 3');
+  }
+  // 必须真按 updatedAt 降序：与数据层独立计算的结果比对
+  const expectRecent = await page.evaluate(async () => {
+    const m = await import('./assets/js/mods.js');
+    return m.recentLevels(3).map((x) => x.id);
+  });
+  if (recentA.join('|') === expectRecent.join('|')) {
+    ok('「最近更新」叠顺序与 recentLevels(3) 完全一致（' + expectRecent.join(' > ') + '）');
+  } else {
+    bad('「最近更新」叠顺序与数据层不符：' + JSON.stringify(recentA)
+        + ' vs ' + JSON.stringify(expectRecent));
+  }
+
+  // 1d. 动态叠的卡片：有夸克链的一律跳夸克；无夸克链的工具类回退详情页
+  //     ⚠️ 工具类（关卡构建器 / 图形编辑器）没有 .pmod 可分享，
+  //        primaryUrl() 会回退到详情页 —— 这不违反"默认跳夸克"的口径。
+  const dynCards = await page.evaluate(async () => {
+    const m = await import('./assets/js/mods.js');
+    const quarkIds = new Set(m.MODS.filter((x) => x.quark).map((x) => x.id));
+    return [...document.querySelectorAll('.stack[data-dynamic="true"] .mod-card')]
+      .map((c) => ({
+        id: c.getAttribute('data-mod-card'),
+        href: c.getAttribute('href'),
+        shouldQuark: quarkIds.has(c.getAttribute('data-mod-card')),
+      }));
+  });
+  const wrong = dynCards.filter(
+    (c) => c.shouldQuark ? !(c.href || '').includes('pan.quark.cn')
+                         : !(c.href || '').includes('.html'));
+  if (dynCards.length && !wrong.length) {
+    ok(`动态叠卡片去向正确（${dynCards.length} 张：有夸克链跳夸克，工具类跳详情页）`);
+  } else {
+    bad('动态叠卡片去向错误：' + JSON.stringify(wrong));
+  }
+
 
   // 2. 收起态几何
   const collapsed = await page.evaluate(() => {
