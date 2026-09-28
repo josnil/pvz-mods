@@ -101,7 +101,7 @@ export const MODS = [
     cardType: 'DIAMOND',
     author: '云漫行',
     version: '1.0.0',
-    fileSize: 624958,
+    fileSize: 517325,
     pkgName: '究极樱桃战神.pmod',
     cardClass: '钻卡',
     description:
