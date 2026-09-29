@@ -1,8 +1,8 @@
 """
-_build_pages.py — 由单份模板生成 3 个分类页 + 12 个 mod 详情页
+_build_pages.py — 由单份模板生成 3 个分类页 + 13 个 mod 详情页
 
 为什么用生成器：
-  15 个页面若各手写一份，改一个卡片结构要改 15 处，必然漂移。
+  16 个页面若各手写一份，改一个卡片结构要改 16 处，必然漂移。
   这里把「页面骨架」收敛成模板函数，数据一律来自 mods.js 的同源副本（PAGES 数据块）。
 
 数据源说明：
@@ -33,14 +33,16 @@ CATEGORIES = [
 
 MODS = [
     dict(id='supergatlingpea', name='超级机枪射手', category='plant',
-         card_type='GOLD', card_class='金卡', version='1.0.0',
-         size=178046, pkg='超级机枪射手.pmod',
+         card_type='GOLD', card_class='金卡', version='1.0.5.0',
+         size=178325, pkg='超级机枪射手.pmod',
          desc='每 1.5 秒向前方一次齐射 7 颗豌豆（横向排开、互不重叠）；每次攻击有 10% 概率触发大招 —— 5 秒内倾泻约 300 颗豌豆。',
          tags=['齐射', '大招', '金卡', '托管插件'],
          stats=[('阳光', '600'), ('血量', '1000'), ('冷却', '30.0s'),
                 ('射速', '1.5s'), ('每轮弹数', '7'), ('弹速', '500')],
-         mechanics=['地形要求：空地可直接种，也可种在双发射手上升级',
-                    '大招触发：每次攻击 10% 概率，持续 5 秒',
+         mechanics=['地形要求：空地可直接种，也可种在豌豆射手上升级（plantCover = PlantPeaShooter）',
+                    '大招触发：每次攻击 10% 概率，持续 5 秒（约 300 颗豌豆）',
+                    '齐射由插件逐颗出膛（fireEventName = "modfire" 摘掉引擎齐射链）',
+                    '全息投影花盆（PotQX）可投影本植物（canCopy = true）',
                     '托管运行时：Runtime/ModAssembly.dll（入口 SuperGatlingPeaRuntimeEntry）'],
          cover_static='supergatlingpea.png', cover_frames=0,
          cover_alt='超级机枪射手 — 戴头盔与护目镜的绿色豌豆射手，装配多管机枪炮口'),
@@ -203,6 +205,25 @@ MODS = [
                     '托管运行时：Runtime/ModAssembly.dll（入口 DrawAndGuessProbeEntry）'],
          cover_static='drawandguess.png', cover_frames=0,
          cover_alt='你画戴夫猜 — 深色画布上左侧是豌豆射手的白色速写线稿，右侧是识别出的真实豌豆射手（蓝色选中框），底部一排植物贴纸'),
+
+    # ── 新增（2026-09-30）：超级汉堡射手 ──
+    dict(id='burgergatlingpea', name='超级汉堡射手', category='plant',
+         card_type='GOLD', card_class='金卡', version='1.1.1.0',
+         size=197437, pkg='超级汉堡射手.pmod',
+         desc='新增植物「超级汉堡射手」：每 2.0 秒向前方一次齐射 9 颗随机子弹（内核 / 豌豆 / 寒冰豌豆 / 火焰豌豆 / 星星 / 棉花 / 地刺 / 卷心菜 / 西瓜 / 冰西瓜，另有 3% 概率来一块黄油）；每次攻击有 10% 概率触发大招 —— 5 秒内倾泻 300 颗随机子弹。金卡，600 阳光，冷却 30.0 秒。',
+         tags=['齐射', '随机子弹', '大招', '金卡', '托管插件'],
+         stats=[('阳光', '600'), ('血量', '1000'), ('冷却', '30.0s'),
+                ('射速', '2.0s'), ('每轮弹数', '9'), ('弹速', '500'),
+                ('子弹种类', '10 种 + 黄油'), ('大招', '10% / 5 秒 / 300 颗')],
+         mechanics=['地形要求：空地可直接种，也可种在豌豆射手上升级（plantCover = PlantPeaShooter）',
+                    '每轮 9 颗随机子弹：10 种等权 97% + 黄油 3%（averageWeight = true，逐字照抄内置 Gold/Hamburger）',
+                    '大招触发：每次攻击 10% 概率，持续 5 秒（约 300 颗随机子弹）',
+                    '齐射由插件逐颗出膛（fireEventName = "modfire" 摘掉引擎齐射链，逐颗间隔 60ms）',
+                    '外观：SuperGatlingB 官方部件图集直转（23 部件 / 26 轨），根精灵 + 独立头精灵，待机动画常驻',
+                    '全息投影花盆（PotQX）可投影本植物（canCopy = true）',
+                    '托管运行时：Runtime/ModAssembly.dll（入口 BurgerGatlingPeaRuntimeEntry）'],
+         cover_static='burgergatlingpea.png', cover_frames=0,
+         cover_alt='超级汉堡射手 — 戴汉堡帽与护目镜的射手植物，绿色炮管上顶着瓜片与黄油'),
 ]
 
 DL_BASE = 'https://github.com/josnil/pvz-mods/releases/latest/download'
@@ -210,7 +231,7 @@ DL_BASE = 'https://github.com/josnil/pvz-mods/releases/latest/download'
 # 夸克网盘 —— 与 assets/js/mods.js 的 QUARK / QUARK_ALL 同源（脚本末尾自检）
 QUARK_ALL = 'https://pan.quark.cn/s/eca3724f6450'
 QUARK = {
-    'supergatlingpea': 'https://pan.quark.cn/s/3e3b62402dfd',
+    'supergatlingpea': 'https://pan.quark.cn/s/e3f000722fbf',
     'ultimatecherrygod': 'https://pan.quark.cn/s/f8cacc624df8',
     'supergatlingpaper': 'https://pan.quark.cn/s/aae6cedcf4dc',
     'sunflowerqueenzombie': 'https://pan.quark.cn/s/05b35a3625e2',
@@ -220,6 +241,7 @@ QUARK = {
     'nailongzombie': 'https://pan.quark.cn/s/f7aeb4a298fe',
     'pandorapool': 'https://pan.quark.cn/s/b9c9a19766c6',
     'drawandguess': 'https://pan.quark.cn/s/ce625d12ca3f',
+    'burgergatlingpea': 'https://pan.quark.cn/s/d6c3c106364d',
 }
 
 CAT_BY_KEY = {c['key']: c for c in CATEGORIES}

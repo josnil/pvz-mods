@@ -45,7 +45,7 @@ export const QUARK_ALL = 'https://pan.quark.cn/s/eca3724f6450';
 
 /** 每个 mod 一份独立夸克链接（键 = mod id） */
 const QUARK = {
-  supergatlingpea: 'https://pan.quark.cn/s/3e3b62402dfd',
+  supergatlingpea: 'https://pan.quark.cn/s/e3f000722fbf',
   ultimatecherrygod: 'https://pan.quark.cn/s/f8cacc624df8',
   supergatlingpaper: 'https://pan.quark.cn/s/aae6cedcf4dc',
   sunflowerqueenzombie: 'https://pan.quark.cn/s/05b35a3625e2',
@@ -55,6 +55,7 @@ const QUARK = {
   nailongzombie: 'https://pan.quark.cn/s/f7aeb4a298fe',
   pandorapool: 'https://pan.quark.cn/s/b9c9a19766c6',
   drawandguess: 'https://pan.quark.cn/s/ce625d12ca3f',
+  burgergatlingpea: 'https://pan.quark.cn/s/d6c3c106364d',
 };
 
 export const MODS = [
@@ -65,8 +66,8 @@ export const MODS = [
     category: 'plant',
     cardType: 'GOLD',
     author: '云漫行',
-    version: '1.0.0',
-    fileSize: 178046,
+    version: '1.0.5.0',
+    fileSize: 178325,
     pkgName: '超级机枪射手.pmod',
     cardClass: '金卡',
     description:
@@ -81,8 +82,10 @@ export const MODS = [
       { label: '弹速', value: '500' },
     ],
     mechanics: [
-      '地形要求：空地可直接种，也可种在双发射手上升级',
-      '大招触发：每次攻击 10% 概率，持续 5 秒',
+      '地形要求：空地可直接种，也可种在豌豆射手上升级（plantCover = PlantPeaShooter）',
+      '大招触发：每次攻击 10% 概率，持续 5 秒（约 300 颗豌豆）',
+      '齐射由插件逐颗出膛（fireEventName = "modfire" 摘掉引擎齐射链）',
+      '全息投影花盆（PotQX）可投影本植物（canCopy = true）',
       '托管运行时：Runtime/ModAssembly.dll（入口 SuperGatlingPeaRuntimeEntry）',
     ],
     cover: {
@@ -93,7 +96,7 @@ export const MODS = [
     },
     download: `${DL_BASE}/supergatlingpea.pmod`,
     quark: QUARK.supergatlingpea,
-    updatedAt: '2026-09-26',
+    updatedAt: '2026-09-30',
   },
   {
     id: 'ultimatecherrygod',
@@ -522,6 +525,50 @@ export const MODS = [
     download: `${DL_BASE}/drawandguess.pmod`,
     quark: QUARK.drawandguess,
     updatedAt: '2026-09-29',
+  },
+
+  /* ═══════════════ 植物类（新增 2026-09-30） ═══════════════ */
+  {
+    id: 'burgergatlingpea',
+    name: '超级汉堡射手',
+    category: 'plant',
+    cardType: 'GOLD',
+    author: '云漫行',
+    version: '1.1.1.0',
+    fileSize: 197437,
+    pkgName: '超级汉堡射手.pmod',
+    cardClass: '金卡',
+    description:
+      '新增植物「超级汉堡射手」：每 2.0 秒向前方一次齐射 9 颗随机子弹（内核 / 豌豆 / 寒冰豌豆 / 火焰豌豆 / 星星 / 棉花 / 地刺 / 卷心菜 / 西瓜 / 冰西瓜，另有 3% 概率来一块黄油）；每次攻击有 10% 概率触发大招 —— 5 秒内倾泻 300 颗随机子弹。金卡，600 阳光，冷却 30.0 秒。',
+    tags: ['齐射', '随机子弹', '大招', '金卡', '托管插件'],
+    stats: [
+      { label: '阳光', value: '600' },
+      { label: '血量', value: '1000' },
+      { label: '冷却', value: '30.0s' },
+      { label: '射速', value: '2.0s' },
+      { label: '每轮弹数', value: '9' },
+      { label: '弹速', value: '500' },
+      { label: '子弹种类', value: '10 种 + 黄油' },
+      { label: '大招', value: '10% / 5 秒 / 300 颗' },
+    ],
+    mechanics: [
+      '地形要求：空地可直接种，也可种在豌豆射手上升级（plantCover = PlantPeaShooter）',
+      '每轮 9 颗随机子弹：10 种等权 97% + 黄油 3%（averageWeight = true，逐字照抄内置 Gold/Hamburger）',
+      '大招触发：每次攻击 10% 概率，持续 5 秒（约 300 颗随机子弹）',
+      '齐射由插件逐颗出膛（fireEventName = "modfire" 摘掉引擎齐射链，逐颗间隔 60ms）',
+      '外观：SuperGatlingB 官方部件图集直转（23 部件 / 26 轨），根精灵 + 独立头精灵，待机动画常驻',
+      '全息投影花盆（PotQX）可投影本植物（canCopy = true）',
+      '托管运行时：Runtime/ModAssembly.dll（入口 BurgerGatlingPeaRuntimeEntry）',
+    ],
+    cover: {
+      static: 'assets/img/covers/burgergatlingpea.png',
+      animated: null,
+      frames: 0,
+      alt: '超级汉堡射手 — 戴汉堡帽与护目镜的射手植物，绿色炮管上顶着瓜片与黄油',
+    },
+    download: `${DL_BASE}/burgergatlingpea.pmod`,
+    quark: QUARK.burgergatlingpea,
+    updatedAt: '2026-09-30',
   },
 ];
 
