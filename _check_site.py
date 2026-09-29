@@ -5,9 +5,11 @@ _check_site.py — 站点验收自查（静态 + 结构 + 无障碍）
   A. 引用完整性  —— HTML/CSS/JS 里出现的每个本地资源都要真实存在
   B. 链接完整性  —— 所有页内 <a href> 指向的本地页面都要存在
   C. JS 接线     —— 每个页面必须挂 app.js，且 body 带 data-depth
-  D. 数据一致性  —— 8 个 mod 在首页/分类页/详情页三处都要出现
+  D. 数据一致性  —— 12 个 mod 在首页/分类页/详情页三处都要出现
   E. 无障碍      —— 焦点样式、reduced-motion 兜底、触控目标、aria 属性
-  F. 负面用例（--neg）—— 故意注入坏数据，断言检查器能抓到
+  F. 云服务      —— publicConfig、计数走 RPC、留言权限口径
+  H. 动效层      —— 星云 / 标题浮动 / 拖尾的性能与降级约束
+  G. 负面用例（--neg）—— 故意注入坏数据，断言检查器能抓到
 """
 
 import os
@@ -182,14 +184,15 @@ def check_wiring():
 MOD_IDS = ['supergatlingpea', 'ultimatecherrygod', 'supergatlingpaper',
            'sunflowerqueenzombie', 'discogargantuarpult',
            'vampirepool', 'gemmatch-builder', 'mod-editor',
-           'peaoverhaul', 'nailongzombie', 'pandorapool']
+           'peaoverhaul', 'nailongzombie', 'pandorapool',
+           'drawandguess']
 
 
 def check_data():
     js = read(os.path.join(ROOT, 'assets', 'js', 'mods.js'))
     idx = read(os.path.join(ROOT, 'index.html'))
 
-    # 1) mods.js 里 11 条 id 齐备
+    # 1) mods.js 里 12 条 id 齐备
     miss = [mid for mid in MOD_IDS if ("id: '%s'" % mid) not in js]
     if miss:
         bad('D mods.js 缺少 %s' % ', '.join(miss))
@@ -353,6 +356,12 @@ def check_quark(js=None):
                 bad('D2 %s 详情页缺夸克下载按钮' % mid)
             if 'github.com/josnil/pvz-mods/releases' not in blk:
                 bad('D2 %s 详情页缺 GitHub 下载按钮（双源要求）' % mid)
+            # ★ 资产名必须是 <id>.pmod（真源见 mods.js 的 download 字段）。
+            #   只断言域名前缀会漏掉「指向包内中文文件名」这类死链
+            #   （实测踩过：所有 GitHub 下载按钮都指到不存在的资产）。
+            if 'releases/latest/download/%s.pmod' % mid not in blk:
+                bad('D2 %s 详情页的 GitHub 下载资产名不对（应为 %s.pmod）'
+                    % (mid, mid))
     ok('D2 %d 个详情页下载块含「本 mod 夸克链 + GitHub 双源 + 总链接」'
        % checked)
 
@@ -651,7 +660,7 @@ def check_cloud():
     if absent:
         bad('F 详情页缺少云挂钩点：' + ', '.join(absent))
     else:
-        ok('F 8 个详情页均含点赞 / 留言 / 登录面板挂钩点')
+        ok('F 详情页挂点齐备：点赞 / 留言 / 登录面板挂钩点均已出现')
 
     # 首页与分类页的卡片需要 data-mod-card（计数徽章的落点）
     cardhosts = 0
@@ -881,7 +890,7 @@ def check_effects():
     else:
         bad('H5 拖尾画布会挡住点击')
 
-    # ── H6. 背景层由 shell 统一注入（11 页一致）─────────────
+    # ── H6. 背景层由 shell 统一注入（全部页面一致）─────────
     if 'bgHTML' in shell and 'class="bg"' in shell:
         ok('H6 背景层由 shell.js 统一注入（单一真源）')
     else:

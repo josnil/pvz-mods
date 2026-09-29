@@ -54,6 +54,7 @@ const QUARK = {
   peaoverhaul: 'https://pan.quark.cn/s/05e3ee9fe1e3',
   nailongzombie: 'https://pan.quark.cn/s/f7aeb4a298fe',
   pandorapool: 'https://pan.quark.cn/s/b9c9a19766c6',
+  drawandguess: 'https://pan.quark.cn/s/c513206d2792',
 };
 
 export const MODS = [
@@ -477,6 +478,49 @@ export const MODS = [
     download: `${DL_BASE}/pandorapool.pmod`,
     quark: QUARK.pandorapool,
     updatedAt: '2026-09-27',
+  },
+
+  /* ═══════════════ 植物类（新增 2026-09-29） ═══════════════ */
+  {
+    id: 'drawandguess',
+    name: '画啥种啥（纯手工档）',
+    category: 'plant',
+    cardType: 'DIAMOND',
+    author: '云漫行',
+    version: '1.11.7.0-hand',
+    fileSize: 1258915,
+    pkgName: 'ProbeV029_hand.pmod',
+    cardClass: '钻卡',
+    description:
+      '种下「画布」植物 ⇒ 弹出画布并暂停战斗；随手画一株植物，关掉画布自动识别，从三个候选里点一个，当场种回原来那一格（不占卡槽、不花阳光）。16 张家族贴纸可抬高对应权重兜底；识别引擎完全本地、不联网。本包是「纯手工档」降级版：刻意不含 42 MB DINO 权重，识别退化为 384 维手工特征检索（严格 Top-3 ≈ 30%），换取秒开与零算力负担。',
+    tags: ['新植物', '手绘识别', '贴纸', '本地推理', '钻卡'],
+    stats: [
+      { label: '阳光', value: '25' },
+      { label: '血量', value: '4000' },
+      { label: '冷却', value: '10.0s' },
+      { label: '家族贴纸', value: '16 张' },
+      { label: '候选池', value: '326 种植物卡' },
+      { label: '严格 Top-3', value: '≈ 30%' },
+      { label: '是否联网', value: '否' },
+    ],
+    mechanics: [
+      '种下「画布」⇒ 弹出画布并暂停战斗；画完关掉即自动识别',
+      '点中候选 ⇒ 当场种回原来那一格，不占卡槽、不花阳光',
+      '贴纸可贴多张、右键单张删除、可整张换色（保留原明暗层次）',
+      '本包 = 纯手工档：不含 DINO 权重，识别走 384 维手工特征检索',
+      '识别全程本地：不联网、不需要任何原生库（裁剪运行时拒绝 ONNX Runtime）',
+      'provide：Character / CharacterSprite / Packet 各 1 项，不改动原版内容',
+      '托管运行时：Runtime/ModAssembly.dll（入口 DrawAndGuessProbeEntry）',
+    ],
+    cover: {
+      static: 'assets/img/covers/drawandguess.png',
+      animated: null,
+      frames: 0,
+      alt: '画啥种啥 — 深色画布上左侧是豌豆射手的白色速写线稿，右侧是识别出的真实豌豆射手（蓝色选中框），底部一排植物贴纸',
+    },
+    download: `${DL_BASE}/drawandguess.pmod`,
+    quark: QUARK.drawandguess,
+    updatedAt: '2026-09-29',
   },
 ];
 
