@@ -11,7 +11,7 @@
 
 **下载渠道**：
 
-- **夸克网盘（推荐）** —— https://pan.quark.cn/s/eca3724f6450 （全部 11 个 `.pmod` 一次拿全）
+- **夸克网盘（推荐）** —— https://pan.quark.cn/s/eca3724f6450 （全部 12 个 `.pmod` 一次拿全）
 - **GitHub Releases** —— https://github.com/josnil/pvz-mods/releases （原始发布源）
 
 > 两个来源内容一致。夸克网盘免登录、国内直连；GitHub 适合海外访问或需版本追溯。
@@ -73,7 +73,7 @@
 ├── index.html                     # 首页：Hero + 5 个牌叠 + 安装说明 + FAQ
 ├── plants.html / zombies.html / others.html   # 三个分类页
 ├── mod/
-│   └── <mod-id>.html × 13         # 每个 Mod 的详情页（属性表 + 实现要点 + 双源下载）
+│   └── <mod-id>.html × 14         # 每个 Mod 的详情页（属性表 + 实现要点 + 双源下载）
 ├── assets/
 │   ├── css/
 │   │   ├── tokens.css             # 设计令牌（单一真源）
@@ -94,9 +94,9 @@
 │   │   ├── cloud-ui.js            # 云数据接 UI（计数徽章 / 点赞 / 留言 / 登录面板）
 │   │   └── app.js                 # 入口，按顺序装配
 │   └── img/
-│       ├── covers/                # 13 张 512×512 封面
+│       ├── covers/                # 14 张 512×512 封面
 │       └── frames/                # 逐帧动画序列图
-├── _build_pages.py                # 由单份模板生成 16 个页面（含夸克链接一致性自检）
+├── _build_pages.py                # 由单份模板生成 17 个页面（含夸克链接一致性自检）
 ├── _check_site.py                 # 验收自查 75 项（含 --neg 16 个负面用例）
 ├── _drive_verify.js               # 起静态服务 + 跑下面的浏览器验收（同进程，避免服务不跨调用存活）
 ├── _verify_interaction.js         # 真实浏览器交互验收（Playwright，28 项）
@@ -298,7 +298,7 @@ node _verify_live.js           # 对线上 URL 再跑一次冒烟（13 项）
 - **A 引用完整性** —— HTML/CSS/JS 里每个本地资源都真实存在
 - **B 链接完整性** —— 所有页内链接、封面图可解析
 - **C JS 接线** —— 每页挂载 `app.js`、`data-depth` 与实际层级一致
-- **D 数据一致性** —— 13 个 mod 在首页/分类页/详情页三处都出现，统计数字**由 mods.js 现算**（不手写）
+- **D 数据一致性** —— 14 个 mod 在首页/分类页/详情页三处都出现，统计数字**由 mods.js 现算**（不手写）
 - **D2 夸克双下载源** —— 每个有 `.pmod` 的 mod 各有独立夸克链、链接互不重复、
   详情页下载块同时含「本 mod 夸克链 + GitHub 双源 + 总链接」、
   分类页卡片默认跳夸克；两个动态叠存在且「全部 mod」声明 `reshuffle:true`

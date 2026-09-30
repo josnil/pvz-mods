@@ -45,8 +45,8 @@ export const QUARK_ALL = 'https://pan.quark.cn/s/eca3724f6450';
 
 /** 每个 mod 一份独立夸克链接（键 = mod id） */
 const QUARK = {
-  supergatlingpea: 'https://pan.quark.cn/s/e3f000722fbf',
-  ultimatecherrygod: 'https://pan.quark.cn/s/f8cacc624df8',
+  supergatlingpea: 'https://pan.quark.cn/s/653286ef7ce7',
+  ultimatecherrygod: 'https://pan.quark.cn/s/11c6df24b494',
   supergatlingpaper: 'https://pan.quark.cn/s/aae6cedcf4dc',
   sunflowerqueenzombie: 'https://pan.quark.cn/s/05b35a3625e2',
   discogargantuarpult: 'https://pan.quark.cn/s/1bd55f3d58f6',
@@ -55,7 +55,8 @@ const QUARK = {
   nailongzombie: 'https://pan.quark.cn/s/f7aeb4a298fe',
   pandorapool: 'https://pan.quark.cn/s/b9c9a19766c6',
   drawandguess: 'https://pan.quark.cn/s/ce625d12ca3f',
-  burgergatlingpea: 'https://pan.quark.cn/s/d6c3c106364d',
+  burgergatlingpea: 'https://pan.quark.cn/s/d3023d885b22',
+  electricsupergatlingpea: 'https://pan.quark.cn/s/e225c8bb3d0d',
 };
 
 export const MODS = [
@@ -96,7 +97,7 @@ export const MODS = [
     },
     download: `${DL_BASE}/supergatlingpea.pmod`,
     quark: QUARK.supergatlingpea,
-    updatedAt: '2026-09-30',
+    updatedAt: '2026-10-01',
   },
   {
     id: 'ultimatecherrygod',
@@ -104,8 +105,8 @@ export const MODS = [
     category: 'plant',
     cardType: 'DIAMOND',
     author: '云漫行',
-    version: '1.0.0',
-    fileSize: 517325,
+    version: '1.1.0.0',
+    fileSize: 517343,
     pkgName: '究极樱桃战神.pmod',
     cardClass: '钻卡',
     description:
@@ -125,7 +126,7 @@ export const MODS = [
       '防爆：explosionHurt = 0，爆炸免伤',
       '防碾压：smashHurt = 500（碾压仅扣 500）；被碾压反伤 500',
       '咬车秒杀：命中车辆直接摧毁，自损 500',
-      '每次咬击回血 100',
+      '每次咬击回血 250',
       '体型：高大（height = 3）',
     ],
     cover: {
@@ -136,7 +137,7 @@ export const MODS = [
     },
     download: `${DL_BASE}/ultimatecherrygod.pmod`,
     quark: QUARK.ultimatecherrygod,
-    updatedAt: '2026-09-26',
+    updatedAt: '2026-10-01',
   },
 
   /* ═══════════════ 僵尸类 ═══════════════ */
@@ -534,26 +535,28 @@ export const MODS = [
     category: 'plant',
     cardType: 'GOLD',
     author: '云漫行',
-    version: '1.1.1.0',
-    fileSize: 197437,
+    version: '1.2.3.0',
+    fileSize: 200678,
     pkgName: '超级汉堡射手.pmod',
     cardClass: '金卡',
     description:
-      '新增植物「超级汉堡射手」：每 2.0 秒向前方一次齐射 9 颗随机子弹（内核 / 豌豆 / 寒冰豌豆 / 火焰豌豆 / 星星 / 棉花 / 地刺 / 卷心菜 / 西瓜 / 冰西瓜，另有 3% 概率来一块黄油）；每次攻击有 10% 概率触发大招 —— 5 秒内倾泻 300 颗随机子弹。金卡，600 阳光，冷却 30.0 秒。',
-    tags: ['齐射', '随机子弹', '大招', '金卡', '托管插件'],
+      '新增植物「超级汉堡射手」：每 2.0 秒向前方一次齐射 9 颗随机子弹 —— 随机池覆盖全游戏 79 种子弹（同名去重后，已排除魅惑类与产资源 / BOSS / 非伤害物件）；另外每 25 秒固定产出 50 阳光。每次攻击有 10% 概率触发大招 —— 5 秒内倾泻 300 颗随机子弹。金卡，600 阳光，冷却 30.0 秒。',
+    tags: ['齐射', '随机子弹', '产阳光', '大招', '金卡', '托管插件'],
     stats: [
       { label: '阳光', value: '600' },
       { label: '血量', value: '1000' },
       { label: '冷却', value: '30.0s' },
       { label: '射速', value: '2.0s' },
       { label: '每轮弹数', value: '9' },
-      { label: '弹速', value: '500' },
-      { label: '子弹种类', value: '10 种 + 黄油' },
+      { label: '随机池', value: '79 种子弹' },
+      { label: '阳光产出', value: '50 / 25 秒' },
       { label: '大招', value: '10% / 5 秒 / 300 颗' },
     ],
     mechanics: [
       '地形要求：空地可直接种，也可种在豌豆射手上升级（plantCover = PlantPeaShooter）',
-      '每轮 9 颗随机子弹：10 种等权 97% + 黄油 3%（averageWeight = true，逐字照抄内置 Gold/Hamburger）',
+      '每轮 9 颗随机子弹：随机池 = 全游戏 79 种子弹等权（按游戏权威注册表 ProjectileRegistry.json 枚举，同名去重）',
+      '池子已排除魅惑类、产资源类、BOSS 与非伤害物件；不含加农炮类 8 种',
+      '新增产能：每 25 秒固定产出 50 阳光（ProduceComponentDefinition + 生成点 ProduceMarker）',
       '大招触发：每次攻击 10% 概率，持续 5 秒（约 300 颗随机子弹）',
       '齐射由插件逐颗出膛（fireEventName = "modfire" 摘掉引擎齐射链，逐颗间隔 60ms）',
       '外观：SuperGatlingB 官方部件图集直转（23 部件 / 26 轨），根精灵 + 独立头精灵，待机动画常驻',
@@ -568,7 +571,51 @@ export const MODS = [
     },
     download: `${DL_BASE}/burgergatlingpea.pmod`,
     quark: QUARK.burgergatlingpea,
-    updatedAt: '2026-09-30',
+    updatedAt: '2026-10-01',
+  },
+
+  /* ═══════════════ 植物类（新增 2026-10-01） ═══════════════ */
+  {
+    id: 'electricsupergatlingpea',
+    name: '电能超级机枪射手',
+    category: 'plant',
+    cardType: 'DIAMOND',
+    author: '云漫行',
+    version: '1.7.0.1',
+    fileSize: 389611,
+    pkgName: '电能超级机枪射手.pmod',
+    cardClass: '钻卡',
+    description:
+      '新增钻卡植物「电能超级机枪射手」：阳光 2000、冷却 60 秒，且不因重复种植涨价。每 1.5 秒打出 6 颗电能豌豆（单颗 30）。电能豌豆无限穿透，对 3×3 范围每 0.15 秒灼烧一次；前 3 次直击时向 3.7 格内的非直击目标放出闪电链（半径 1.5 格 / 300 点）；受击目标 1% 概率定身 0.5 秒。每次攻击有 10% 概率触发大招 —— 5 秒内每 0.02 秒散射 3 颗，共 750 颗。外观取自 PVZ Fusion 电能素材（借轨换皮，保留 87 帧动画），自带「青雷皮肤」装扮。',
+    tags: ['电能豌豆', '穿透', '闪电链', '大招', '钻卡', '托管插件'],
+    stats: [
+      { label: '阳光', value: '2000' },
+      { label: '血量', value: '1000' },
+      { label: '冷却', value: '60s' },
+      { label: '重复种植涨价', value: '否' },
+      { label: '射速', value: '1.5s / 6 颗' },
+      { label: '单颗伤害', value: '30' },
+      { label: '大招', value: '10% / 5 秒 / 750 颗' },
+    ],
+    mechanics: [
+      '钻卡：阳光 2000、冷却 60s、血量 1000；costRise = 0 ⇒ 不因重复种植涨价',
+      '电能豌豆（ElectricPea）：单颗 30、无限穿透，对 3×3 范围每 0.15 秒灼烧一次',
+      '前 3 次直击时向 3.7 格内的非直击目标放出闪电链（半径 1.5 格 / 300 点）',
+      '受击目标 1% 概率定身 0.5 秒',
+      '大招：每次攻击 10% 概率触发，持续 5 秒，每 0.02 秒散射 3 颗，共 750 颗',
+      '外观取自 PVZ Fusion 电能素材借轨换皮（保留 87 帧动画）；子弹外观由插件运行时生成',
+      '自带装扮「青雷皮肤」（游戏内商店购买解锁，装备后整套配色转青）',
+      'provide：Character / CharacterSprite / Packet / Projectile 各 1 项；托管运行时 Runtime/ModAssembly.dll（入口 ElectricSuperGatlingPeaRuntimeEntry）',
+    ],
+    cover: {
+      static: 'assets/img/covers/electricsupergatlingpea.png',
+      animated: null,
+      frames: 0,
+      alt: '电能超级机枪射手 — 戴闪电纹头盔与护目镜的黄绿色射手植物，炮口朝右，周身缠绕电光',
+    },
+    download: `${DL_BASE}/electricsupergatlingpea.pmod`,
+    quark: QUARK.electricsupergatlingpea,
+    updatedAt: '2026-10-01',
   },
 ];
 

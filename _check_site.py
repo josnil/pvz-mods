@@ -5,7 +5,7 @@ _check_site.py — 站点验收自查（静态 + 结构 + 无障碍）
   A. 引用完整性  —— HTML/CSS/JS 里出现的每个本地资源都要真实存在
   B. 链接完整性  —— 所有页内 <a href> 指向的本地页面都要存在
   C. JS 接线     —— 每个页面必须挂 app.js，且 body 带 data-depth
-  D. 数据一致性  —— 13 个 mod 在首页/分类页/详情页三处都要出现
+  D. 数据一致性  —— 14 个 mod 在首页/分类页/详情页三处都要出现
   E. 无障碍      —— 焦点样式、reduced-motion 兜底、触控目标、aria 属性
   F. 云服务      —— publicConfig、计数走 RPC、留言权限口径
   H. 动效层      —— 星云 / 标题浮动 / 拖尾的性能与降级约束
@@ -185,14 +185,14 @@ MOD_IDS = ['supergatlingpea', 'ultimatecherrygod', 'supergatlingpaper',
            'sunflowerqueenzombie', 'discogargantuarpult',
            'vampirepool', 'gemmatch-builder', 'mod-editor',
            'peaoverhaul', 'nailongzombie', 'pandorapool',
-           'drawandguess', 'burgergatlingpea']
+           'drawandguess', 'burgergatlingpea', 'electricsupergatlingpea']
 
 
 def check_data():
     js = read(os.path.join(ROOT, 'assets', 'js', 'mods.js'))
     idx = read(os.path.join(ROOT, 'index.html'))
 
-    # 1) mods.js 里 13 条 id 齐备
+    # 1) mods.js 里 14 条 id 齐备
     miss = [mid for mid in MOD_IDS if ("id: '%s'" % mid) not in js]
     if miss:
         bad('D mods.js 缺少 %s' % ', '.join(miss))
