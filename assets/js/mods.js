@@ -45,18 +45,18 @@ export const QUARK_ALL = 'https://pan.quark.cn/s/eca3724f6450';
 
 /** 每个 mod 一份独立夸克链接（键 = mod id） */
 const QUARK = {
-  supergatlingpea: 'https://pan.quark.cn/s/653286ef7ce7',
-  ultimatecherrygod: 'https://pan.quark.cn/s/11c6df24b494',
-  supergatlingpaper: 'https://pan.quark.cn/s/aae6cedcf4dc',
-  sunflowerqueenzombie: 'https://pan.quark.cn/s/05b35a3625e2',
-  discogargantuarpult: 'https://pan.quark.cn/s/1bd55f3d58f6',
-  vampirepool: 'https://pan.quark.cn/s/7ecbb59a05cc',
-  peaoverhaul: 'https://pan.quark.cn/s/05e3ee9fe1e3',
-  nailongzombie: 'https://pan.quark.cn/s/f7aeb4a298fe',
-  pandorapool: 'https://pan.quark.cn/s/b9c9a19766c6',
-  drawandguess: 'https://pan.quark.cn/s/ce625d12ca3f',
-  burgergatlingpea: 'https://pan.quark.cn/s/d3023d885b22',
-  electricsupergatlingpea: 'https://pan.quark.cn/s/e225c8bb3d0d',
+  supergatlingpea: 'https://pan.quark.cn/s/0fb95b4b0e26',
+  ultimatecherrygod: 'https://pan.quark.cn/s/44ebc873791c',
+  supergatlingpaper: 'https://pan.quark.cn/s/6dc4b12ca58c',
+  sunflowerqueenzombie: 'https://pan.quark.cn/s/b5490a75314b',
+  discogargantuarpult: 'https://pan.quark.cn/s/70c392ee2be1',
+  vampirepool: 'https://pan.quark.cn/s/300f8bce5977',
+  peaoverhaul: 'https://pan.quark.cn/s/e7c27d6632a2',
+  nailongzombie: 'https://pan.quark.cn/s/4f594a0b75e0',
+  pandorapool: 'https://pan.quark.cn/s/89cfccf2d3c1',
+  drawandguess: 'https://pan.quark.cn/s/2c0ce3ade3eb',
+  burgergatlingpea: 'https://pan.quark.cn/s/a03dcd58ce62',
+  electricsupergatlingpea: 'https://pan.quark.cn/s/23905a284140',
 };
 
 export const MODS = [
@@ -67,9 +67,9 @@ export const MODS = [
     category: 'plant',
     cardType: 'GOLD',
     author: '云漫行',
-    version: '1.0.5.0',
-    fileSize: 178325,
-    pkgName: '超级机枪射手.pmod',
+    version: '1.0.5',
+    fileSize: 178323,
+    pkgName: '超级机枪射手_v1.0.5.pmod',
     cardClass: '金卡',
     description:
       '每 1.5 秒向前方一次齐射 7 颗豌豆（横向排开、互不重叠）；每次攻击有 10% 概率触发大招 —— 5 秒内倾泻约 300 颗豌豆。',
@@ -97,7 +97,7 @@ export const MODS = [
     },
     download: `${DL_BASE}/supergatlingpea.pmod`,
     quark: QUARK.supergatlingpea,
-    updatedAt: '2026-10-01',
+    updatedAt: '2026-10-17',
   },
   {
     id: 'ultimatecherrygod',
@@ -105,9 +105,9 @@ export const MODS = [
     category: 'plant',
     cardType: 'DIAMOND',
     author: '云漫行',
-    version: '1.1.0.0',
-    fileSize: 517343,
-    pkgName: '究极樱桃战神.pmod',
+    version: '1.1.0',
+    fileSize: 517342,
+    pkgName: '究极樱桃战神_v1.1.0.pmod',
     cardClass: '钻卡',
     description:
       '高大近战植物：撕咬前方一格造成 300 伤害，并吐出樱桃子弹（直击 300 + 3×3 溅射 300）。被碾压反伤，咬车秒杀，每次咬击回血。',
@@ -137,7 +137,7 @@ export const MODS = [
     },
     download: `${DL_BASE}/ultimatecherrygod.pmod`,
     quark: QUARK.ultimatecherrygod,
-    updatedAt: '2026-10-01',
+    updatedAt: '2026-10-17',
   },
 
   /* ═══════════════ 僵尸类 ═══════════════ */
@@ -147,9 +147,9 @@ export const MODS = [
     category: 'zombie',
     cardType: 'DIAMOND',
     author: '云漫行',
-    version: '1.0.0',
-    fileSize: 181388,
-    pkgName: '超级机枪读报僵尸.pmod',
+    version: '1.0.1',
+    fileSize: 185158,
+    pkgName: '超级机枪读报僵尸_v1.0.1.pmod',
     cardClass: '钻卡',
     description:
       '读报僵尸的身体 + 超级机枪射手的头。每 1.5 秒直线连发 7 颗豌豆，10% 概率触发 5 秒 300 颗大招；报纸被打破后 3 倍速暴走。',
@@ -176,7 +176,7 @@ export const MODS = [
     },
     download: `${DL_BASE}/supergatlingpaper.pmod`,
     quark: QUARK.supergatlingpaper,
-    updatedAt: '2026-09-24',
+    updatedAt: '2026-10-17',
   },
   {
     id: 'sunflowerqueenzombie',
@@ -184,9 +184,9 @@ export const MODS = [
     category: 'zombie',
     cardType: 'DIAMOND',
     author: '云漫行',
-    version: '1.0.0',
-    fileSize: 26282,
-    pkgName: '向日葵女王僵尸.pmod',
+    version: '1.1.0+1',
+    fileSize: 30414,
+    pkgName: '向日葵女王僵尸_v1.1.0+1.pmod',
     cardClass: '一包两角色',
     description:
       '一包两个僵尸共用一个 DLL：女王 = 火焰迪斯科身体 + 向日葵女王头，会滑步、点燃队友子弹、召唤伴舞；舞者 = 火焰舞者身体 + 同款头。',
@@ -216,7 +216,7 @@ export const MODS = [
     },
     download: `${DL_BASE}/sunflowerqueenzombie.pmod`,
     quark: QUARK.sunflowerqueenzombie,
-    updatedAt: '2026-09-25',
+    updatedAt: '2026-10-17',
   },
   {
     id: 'discogargantuarpult',
@@ -224,9 +224,9 @@ export const MODS = [
     category: 'zombie',
     cardType: 'GOLD',
     author: '云漫行',
-    version: '1.0.0',
-    fileSize: 16180,
-    pkgName: '暴走舞王伽刚特尔投石车僵尸.pmod',
+    version: '1.0.1',
+    fileSize: 20226,
+    pkgName: '暴走舞王伽刚特尔投石车僵尸_v1.0.1.pmod',
     cardClass: '金卡',
     description:
       '外形与机制完全照搬「小鬼投石车僵尸」，唯一区别是投石车里扔出来的不是小鬼，而是「暴走舞王伽刚特尔」。',
@@ -252,7 +252,7 @@ export const MODS = [
     },
     download: `${DL_BASE}/discogargantuarpult.pmod`,
     quark: QUARK.discogargantuarpult,
-    updatedAt: '2026-09-22',
+    updatedAt: '2026-10-17',
   },
 
   /* ═══════════════ 其他：地图 ═══════════════ */
@@ -263,8 +263,8 @@ export const MODS = [
     cardType: 'MAP',
     author: '云漫行',
     version: '1.0.0',
-    fileSize: 327435,
-    pkgName: '吸血鬼屋泳池.pmod',
+    fileSize: 327440,
+    pkgName: '吸血鬼屋泳池_v1.0.0.pmod',
     cardClass: '地图',
     description:
       '以「吸血鬼屋」为基底继承全部特性（夜晚 / 无天降阳光 / 吸血规则 / 昼夜元素格），行数由 5 扩到 6，并把第 4~5 行 × 第 1~9 列设为血池。',
@@ -291,7 +291,7 @@ export const MODS = [
     },
     download: `${DL_BASE}/vampirepool.pmod`,
     quark: QUARK.vampirepool,
-    updatedAt: '2026-09-19',
+    updatedAt: '2026-10-17',
   },
 
   /* ═══════════════ 其他：工具 ═══════════════ */
@@ -301,7 +301,7 @@ export const MODS = [
     category: 'other',
     cardType: 'TOOL',
     author: '云漫行',
-    version: '0.28',
+    version: '0.28.0',
     fileSize: 0,
     pkgName: '',
     cardClass: '工具',
@@ -334,7 +334,7 @@ export const MODS = [
     category: 'other',
     cardType: 'TOOL',
     author: '云漫行',
-    version: '1.0',
+    version: '1.0.0',
     fileSize: 0,
     pkgName: '',
     cardClass: '工具',
@@ -371,7 +371,7 @@ export const MODS = [
     author: '云漫行',
     version: '1.0.0',
     fileSize: 3212,
-    pkgName: 'PeaOverhaul.pmod',
+    pkgName: '豌豆强化_v1.0.0.pmod',
     cardClass: '覆盖型',
     description:
       '放大豌豆类子弹并提升伤害与穿透：一次覆盖 PeaDefault / SnowPea / FirePea / GoldPea 四种子弹，子弹 scale 提到 1.6 倍、穿透 8 个。演示型 Mod，适合作为「覆盖内置资源」的模板。',
@@ -399,7 +399,7 @@ export const MODS = [
     },
     download: `${DL_BASE}/peaoverhaul.pmod`,
     quark: QUARK.peaoverhaul,
-    updatedAt: '2026-09-15',
+    updatedAt: '2026-10-17',
   },
 
   /* ═══════════════ 僵尸类（新增） ═══════════════ */
@@ -409,9 +409,9 @@ export const MODS = [
     category: 'zombie',
     cardType: 'NORMAL',
     author: '云漫行',
-    version: '1.0.0',
-    fileSize: 828651,
-    pkgName: '奶龙僵尸.pmod',
+    version: '1.0.1',
+    fileSize: 832338,
+    pkgName: '奶龙僵尸_v1.0.1.pmod',
     cardClass: '普通卡',
     description:
       '普通僵尸的移动 / 啃食 / 受击 / 死亡，外加大笑控场：出场后每 10 秒大笑一次，切到大笑形象并播奶龙笑声，一边笑一边照常往前冲；全场植物被笑得僵直 3 秒、完全无法发射子弹。',
@@ -439,7 +439,7 @@ export const MODS = [
     },
     download: `${DL_BASE}/nailongzombie.pmod`,
     quark: QUARK.nailongzombie,
-    updatedAt: '2026-09-25',
+    updatedAt: '2026-10-17',
   },
 
   /* ═══════════════ 其他：地图（新增） ═══════════════ */
@@ -450,8 +450,8 @@ export const MODS = [
     cardType: 'MAP',
     author: '云漫行',
     version: '1.1.0',
-    fileSize: 14287,
-    pkgName: '潘多拉泳池.pmod',
+    fileSize: 14278,
+    pkgName: '潘多拉泳池_v1.1.0.pmod',
     cardClass: '地图',
     description:
       '泳池自选卡关卡：初始阳光 1500，开局即出戴夫博士（0.45 倍血 144000），普通/路障/铁桶僵尸源源不断（15 波），击败博士并清空全场才算胜利。命运选项框每 25 秒弹出，选「衰老」则 45 秒内无法使用铲子。',
@@ -481,7 +481,7 @@ export const MODS = [
     },
     download: `${DL_BASE}/pandorapool.pmod`,
     quark: QUARK.pandorapool,
-    updatedAt: '2026-09-27',
+    updatedAt: '2026-10-17',
   },
 
   /* ═══════════════ 植物类（新增 2026-09-29） ═══════════════ */
@@ -491,9 +491,9 @@ export const MODS = [
     category: 'plant',
     cardType: 'DIAMOND',
     author: '云漫行',
-    version: '1.11.7.0-hand',
-    fileSize: 1261237,
-    pkgName: '你画戴夫猜_轻量版_v1.11.7.0.pmod',
+    version: '1.11.7-hand',
+    fileSize: 1261234,
+    pkgName: '你画戴夫猜_轻量版_v1.11.7-hand.pmod',
     cardClass: '钻卡',
     description:
       '你画戴夫猜（轻量版）—— 玩法与完整版完全一样；识别模型做了精简，整个包只有约 1.2 MB。种下「画布」植物 ⇒ 弹出画布并暂停战斗 ⇒ 随手画一株植物 ⇒ 关掉画布（或点「提交」）自动识别 ⇒ 从三个候选里点一个，当场种回原来那一格（不占卡槽、不花阳光）。画不准可用「贴纸 ▾」选一个家族贴上兜底；自带基础识别库（内置 326 种植物全都有），装好即可玩，不联网、不需要任何额外组件。',
@@ -525,7 +525,7 @@ export const MODS = [
     },
     download: `${DL_BASE}/drawandguess.pmod`,
     quark: QUARK.drawandguess,
-    updatedAt: '2026-09-29',
+    updatedAt: '2026-10-17',
   },
 
   /* ═══════════════ 植物类（新增 2026-09-30） ═══════════════ */
@@ -535,9 +535,9 @@ export const MODS = [
     category: 'plant',
     cardType: 'GOLD',
     author: '云漫行',
-    version: '1.2.3.0',
-    fileSize: 200678,
-    pkgName: '超级汉堡射手.pmod',
+    version: '1.2.4',
+    fileSize: 200910,
+    pkgName: '超级汉堡射手_v1.2.4.pmod',
     cardClass: '金卡',
     description:
       '新增植物「超级汉堡射手」：每 2.0 秒向前方一次齐射 9 颗随机子弹 —— 随机池覆盖全游戏 79 种子弹（同名去重后，已排除魅惑类与产资源 / BOSS / 非伤害物件）；另外每 25 秒固定产出 50 阳光。每次攻击有 10% 概率触发大招 —— 5 秒内倾泻 300 颗随机子弹。金卡，600 阳光，冷却 30.0 秒。',
@@ -571,7 +571,7 @@ export const MODS = [
     },
     download: `${DL_BASE}/burgergatlingpea.pmod`,
     quark: QUARK.burgergatlingpea,
-    updatedAt: '2026-10-01',
+    updatedAt: '2026-10-17',
   },
 
   /* ═══════════════ 植物类（新增 2026-10-01） ═══════════════ */
@@ -581,9 +581,9 @@ export const MODS = [
     category: 'plant',
     cardType: 'DIAMOND',
     author: '云漫行',
-    version: '1.7.0.1',
-    fileSize: 389611,
-    pkgName: '电能超级机枪射手.pmod',
+    version: '1.8.1',
+    fileSize: 531249,
+    pkgName: '电能超级机枪射手_v1.8.1.pmod',
     cardClass: '钻卡',
     description:
       '新增钻卡植物「电能超级机枪射手」：阳光 2000、冷却 60 秒，且不因重复种植涨价。每 1.5 秒打出 6 颗电能豌豆（单颗 30）。电能豌豆无限穿透，对 3×3 范围每 0.15 秒灼烧一次；前 3 次直击时向 3.7 格内的非直击目标放出闪电链（半径 1.5 格 / 300 点）；受击目标 1% 概率定身 0.5 秒。每次攻击有 10% 概率触发大招 —— 5 秒内每 0.02 秒散射 3 颗，共 750 颗。外观取自 PVZ Fusion 电能素材（借轨换皮，保留 87 帧动画），自带「青雷皮肤」装扮。',
@@ -615,7 +615,7 @@ export const MODS = [
     },
     download: `${DL_BASE}/electricsupergatlingpea.pmod`,
     quark: QUARK.electricsupergatlingpea,
-    updatedAt: '2026-10-01',
+    updatedAt: '2026-10-17',
   },
 ];
 

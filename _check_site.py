@@ -1091,8 +1091,13 @@ def run_neg():
     p15 = os.path.join(dst15, 'assets', 'js', 'mods.js')
     with open(p15, encoding='utf-8') as f:
         t15 = f.read()
-    t15 = t15.replace('pandorapool: \'https://pan.quark.cn/s/b9c9a19766c6\'',
-                      'pandorapool: \'https://pan.quark.cn/s/7ecbb59a05cc\'')
+    # ⚠️ 这里**不许硬编码 URL** —— 2026-10-17 踩过：夸克链接换代后 replace 静默不命中，
+    #    用例照样"跑过"但什么都没改，于是报「检查器有盲区」假警报。改为运行期读取再互换。
+    mp = re.search(r"\n  pandorapool: '([^']+)'", t15)
+    mv = re.search(r"\n  vampirepool: '([^']+)'", t15)
+    if not (mp and mv):
+        raise SystemExit('[neg] 用例 15 前置失败：mods.js 里找不到 pandorapool / vampirepool 的夸克链接')
+    t15 = t15.replace(mp.group(0), "\n  pandorapool: '%s'" % mv.group(1))   # 单向串行：pandora 借用 vampire 的链接 ⇒ 必然重复
     with open(p15, 'w', encoding='utf-8', newline='') as f:
         f.write(t15)
     cases.append(('夸克链接串行（pandora↔vampire）', dst15, 'quarkdup'))
